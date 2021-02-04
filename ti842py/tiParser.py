@@ -72,7 +72,8 @@ class BasicParser(object):
 		skipLine = False
 		for index, line in enumerate(self.basic):
 			statement = ""
-			if line.startswith("\""):
+			# TODO: Make rules for :, dont fully understand it yet
+			if line.startswith("\"") or line.startswith(":"):
 				# Comments
 				statement = "# " + line.lstrip("\"")
 			elif skipLine == True:
@@ -155,15 +156,17 @@ class BasicParser(object):
 			elif line.startswith("Prompt"):
 				variable = line[7:]
 				statement = variable + " = input(\"" + variable + "=?\")"
-
+			elif line == "getKey":
+				statement = "getKey()"
 			else:
+				print(repr(statement))
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
 				logger.warning("Unknown indentifier on line %s", index)
 
 			# getKey
 			# TODO: Dont detect getKey if its in a string
 			if "getKey" in statement:
-				statement = statement.replace("getKey", "getKey()")
+				statement = re.sub(r"getKey[^(]+", "getKey()", statement)
 				self.UTILS["getKey"]["enabled"] = True
 
 			if indentDecrease == True:

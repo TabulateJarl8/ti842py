@@ -2,7 +2,7 @@ import setuptools
 import os
 
 install_requires = [
-	"argparse"
+	"basically-ti-basic>=0.1.4"
 ]
 
 with open("README.md", "r") as fh:
