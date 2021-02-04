@@ -161,6 +161,7 @@ class BasicParser(object):
 				logger.warning("Unknown indentifier on line %s", index)
 
 			# getKey
+			# TODO: Dont detect getKey if its in a string
 			if "getKey" in statement:
 				statement = statement.replace("getKey", "getKey()")
 				self.UTILS["getKey"]["enabled"] = True
