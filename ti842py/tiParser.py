@@ -51,7 +51,7 @@ class BasicParser(object):
 		# Utility Functions
 		self.UTILS = {}
 		here = os.path.abspath(os.path.dirname(__file__))
-		for file in os.listdir(os.path.join(here, "utils")):
+		for file in [file for file in os.listdir(os.path.join(here, "utils")) if os.path.isfile(os.path.join(here, "utils", file))]:
 			with open(os.path.join(here, "utils", file)) as f:
 				self.UTILS[os.path.splitext(file)[0]] = {}
 				self.UTILS[os.path.splitext(file)[0]]["code"] = [line.rstrip() for line in f.readlines() if not line.startswith("import ")]

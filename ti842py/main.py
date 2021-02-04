@@ -1,5 +1,4 @@
 import argparse
-import pyparsing
 try:
 	from .tiParser import BasicParser
 except:
