@@ -50,14 +50,16 @@ class BasicParser(object):
 		# Utility Functions
 		self.IMPORTS = ["import os", "import time", ""]
 		self.CLEAR = ["def clear():", "\tif os.system(\"clear\") != 0:", "\t\tif os.system(\"cls\") != 0:", "\t\t\tprint(\"Clearing the screen is not supported on this device\")", ""]
-
+		
 	def toPython(self):
 		pythonCode = []
 		# Add utility functions
 		pythonCode += self.IMPORTS
 		pythonCode += self.CLEAR
+		
+		pythonCode += ["def main():"]
 
-		indentLevel = 0
+		indentLevel = 1
 		# indentIncrease increases the indent on the next line
 		indentIncrease = False
 		# indentDecrease decreases the indent on the current line
@@ -147,9 +149,7 @@ class BasicParser(object):
 			# Prompt
 			elif line.startswith("Prompt"):
 				variable = line[7:]
-				statement = variable + " = input(\"" + variable + "=?\")"
-			
-				
+				statement = variable + " = input(\"" + variable + "=?\")"			
 
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
@@ -168,5 +168,7 @@ class BasicParser(object):
 			if indentIncrease == True:
 				indentLevel += 1
 				indentIncrease = False
+				
+		pythonCode += ["if __name__ == \"__main__\":", "\tmain()"]
 
 		return pythonCode
