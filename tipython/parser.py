@@ -48,7 +48,7 @@ class BasicParser(object):
 			raise TypeError("basic must be list or str, not {}".format(str(type(basic))))
 
 		# Utility Functions
-		self.IMPORTS = ["import os", ""]
+		self.IMPORTS = ["import os", "import time", ""]
 		self.CLEAR = ["def clear():", "\tif os.system(\"clear\") != 0:", "\t\tif os.system(\"cls\") != 0:", "\t\t\tprint(\"Clearing the screen is not supported on this device\")", ""]
 
 	def toPython(self):
@@ -125,6 +125,31 @@ class BasicParser(object):
 			elif line.startswith("Repeat "):
 				statement = ["firstPass = True", "while firstPass == True or " + fixEquals(line[7:]) + "):", "\tfirstPass = False"]
 				indentIncrease = True
+			# Pause
+			elif line.startswith("Pause"):
+				args = line[5:].strip().split(",")
+				print(args)
+				if len(args) <= 1:
+					statement = "input("
+					if len(args) == 1:
+						statement += str(args[0]) + ")"
+				else:
+					statement = ["print(" + str(args[0]) + ")", "time.sleep(" + args[1] + ")"]
+			# Wait		
+			elif line.startswith("Wait"):
+				statement = "time.sleep(" + line[5:] + ")"
+			# Stop
+			elif line == "Stop":
+				statement = "exit()"
+			# DelVar
+			elif line.startswith("DelVar"):
+				statement = "del " + line[7:]
+			# Prompt
+			elif line.startswith("Prompt"):
+				variable = line[7:]
+				statement = variable + " = input(\"" + variable + "=?\")"
+			
+				
 
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)

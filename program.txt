@@ -31,3 +31,7 @@ Repeat J>=6
 J+1->J
 End
 Disp "J=",J
+Pause "PRESS ENTER"
+Disp "NOW WAIT"
+Wait 5
+Prompt X
