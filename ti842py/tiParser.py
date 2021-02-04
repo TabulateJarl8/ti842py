@@ -120,7 +120,11 @@ class BasicParser(object):
 			# Input
 			elif line.startswith("Input"):
 				statement = line.split(",")
-				statement = statement[1] + " = input(" + closeOpen(statement[0][6:]) + ")"
+				if "," in statement[1]:
+					statement = statement[1] + " = [toNumber(number) for number in input(" + closeOpen(statement[0][6:]) + ")]"
+				else:
+					statement = variable + " = toNumber(input(" + closeOpen(statement[0][6:]) + "))"
+				self.UTILS["toNumber"]["enabled"] = True
 			# For loop
 			elif line.startswith("For"):
 				args = line[3:].strip("()").split(",")
@@ -158,7 +162,11 @@ class BasicParser(object):
 			# Prompt
 			elif line.startswith("Prompt"):
 				variable = line[7:]
-				statement = variable + " = input(\"" + variable + "=?\")"
+				if "," in variable:
+					statement = variable + " = [toNumber(number) for number in input(\"" + variable + "=?\").split(\",\")]"
+				else:
+					statement = variable + " = toNumber(input(\"" + variable + "=?\"))"
+				self.UTILS["toNumber"]["enabled"] = True
 			elif line == "getKey":
 				statement = "getKey()"
 			else:
@@ -171,6 +179,8 @@ class BasicParser(object):
 			if "getKey" in statement:
 				statement = re.sub(r"getKey[^(]+", "getKey()", statement)
 				self.UTILS["getKey"]["enabled"] = True
+			if "[theta]" in statement:
+				statement = statement.replace("[theta]", "theta")
 
 			if indentDecrease == True:
 				indentLevel -= 1
