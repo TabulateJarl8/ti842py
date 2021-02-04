@@ -32,7 +32,10 @@ def closeOpen(string):
 			closingChar = ")"
 		newString += c
 	return newString
-
+	
+def fixEquals(string):
+	# Change = to ==
+	return re.sub("(?<![<>!])\=", " == ", string)
 
 
 class BasicParser(object):
@@ -80,7 +83,7 @@ class BasicParser(object):
 			# If
 			elif line.startswith("If "):
 				statement = "if " + line.lstrip("If ")
-				statement = statement.replace("=", " == ")
+				statement = fixEquals(statement)
 				statement = statement + ":"
 				indentIncrease = True
 			elif line == "Then":
@@ -88,7 +91,7 @@ class BasicParser(object):
 			# Elif
 			elif line == "Else" and self.basic[index + 1].startswith("If"):
 				statement = "elif " + self.basic[index + 1].lstrip("If ")
-				statement = statement.replace("=", " == ")
+				statement = fixEquals(statement)
 				statement = statement + ":"
 				indentDecrease = True
 				indentIncrease = True
@@ -116,12 +119,12 @@ class BasicParser(object):
 				indentIncrease = True
 			# While loop
 			elif line.startswith("While "):
-				statement = "while " + line[6:].replace("=", " == ") + ":"
+				statement = "while " + fixEquals(line[6:]) + ":"
 				indentIncrease = True
 			# Repeat loop (tests at bottom)
 			elif line.startswith("Repeat "):
-				statement = ["firstPass = True", "while firstPass == True or " + line[7:].replace("=", " == ") + ":", "\tfirstPass = False"]
-				indentLevel += 1
+				statement = ["firstPass = True", "while firstPass == True or " + fixEquals(line[7:]) + "):", "\tfirstPass = False"]
+				indentIncrease = True
 
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
@@ -134,7 +137,8 @@ class BasicParser(object):
 			if isinstance(statement, str):
 				pythonCode.append("\t"*indentLevel + statement)
 			elif isinstance(statement, list):
-				pythonCode.extend(statement)
+				for item in statement:
+					pythonCode.append("\t"*indentLevel + item)
 
 			if indentIncrease == True:
 				indentLevel += 1
