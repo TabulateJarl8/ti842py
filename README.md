@@ -8,7 +8,7 @@
 
 ----
 
-ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of software that can convert code from one language to another. This program should be able to convert a lot of programs, but if you find something that it can't convert yet, start an issue. This transpiler also has the ability to automatically decompile any 8Xp file that you supply as the input file, with the help of my other project [basically-ti-basic](https://github.com/TabulateJarl8/basically-ti-basic).
+ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of software that can convert code from one language to another. This program should be able to convert a lot of programs, but if you find something that it can't convert yet, start an issue. This transpiler also has the ability to automatically decompile any 8Xp file that you supply as the input file, with the help of my other project [basically-ti-basic](https://github.com/TabulateJarl8/basically-ti-basic). Note that this software is in beta and may produce inaccurate results.
 
 # Features
 
@@ -76,3 +76,8 @@ transpile("tiprogram.txt", "tiprogram.py")
 Again, if the second argument is not supplied, the program will be written to `stdout`. The `transpile` command can be supplied with 2 optional arguments, `decompileFile` and `forceDecompile`. `decompileFile` defaults to `True`, and `forceDecompile` defaults to `False`
 
 The last way that ti842py can be ran is by running the main python file. After cloning the repository, cd into the repository and run `python ti842py/main.py -i inputfile.txt`. You can supply any arguments that you would supply with the `ti842py` command.
+
+# Special functions
+----
+
+ - `getKey` - The `getKey` function works just like it does in normal TI-BASIC, except with some special rules. Any key on the keyboard pressed will be converted to the corresponding key on the calculator. This works for letters, numbers, arrow keys, enter, delete, and symbols. As for the buttons not on a keyboard, the top 5 keys are the F1-F5 keys on the keyboard, `2nd` is alt, and `alpha` is ctrl. `mode` is F6, `stat` is f7, `vars` is F8, `clear` is F9, and the `X,T,θ,n` key is F10.
