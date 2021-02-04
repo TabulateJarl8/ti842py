@@ -16,9 +16,9 @@ def closeOpen(string):
 			if open == True:
 				# Append open character to string
 				c += closingChar
-		elif c == "," and open == True:
+		# elif c == "," and open == True:
 			# Reached a comma with open character
-			newString += closingChar
+			# newString += closingChar
 		elif open == True and c == closingChar:
 			# Closing character reached
 			open = False
@@ -79,6 +79,9 @@ class BasicParser(object):
 			elif skipLine == True:
 				skipLine = False
 				continue
+			elif line == "":
+				# Blank
+				statement = ""
 			# Disp
 			elif line.startswith("Disp "):
 				statement = re.search("Disp (.*[^)])", line).groups(1)[0]
