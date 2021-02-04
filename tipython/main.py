@@ -2,7 +2,7 @@ import argparse
 import pyparsing
 from parser import BasicParser
 
-def transpile(infile, outfile):
+def transpile(infile, outfile="stdout"):
 
 	# Read infile
 	with open(infile, 'r') as f:
