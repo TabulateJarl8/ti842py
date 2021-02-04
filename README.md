@@ -1,5 +1,11 @@
 # ti842py
 
+[![PyPI version](https://badge.fury.io/py/ti842py.svg)](https://badge.fury.io/py/ti842py)
+[![Downloads](https://pepy.tech/badge/ti842py)](https://pepy.tech/project/ti842py)
+[![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg)](https://pypi.python.org/pypi/ansicolortags/)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/TabulateJarl8/ti842py/graphs/commit-activity)
+[![GitHub issues](https://img.shields.io/github/issues/TabulateJarl8/ti842py.svg)](https://GitHub.com/TabulateJarl8/ti842py/issues/)
+
 ----
 
 ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of software that can convert code from one language to another. This program should be able to convert a lot of programs, but if you find something that it can't convert yet, start an issue.
