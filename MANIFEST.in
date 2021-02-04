@@ -1,1 +1,1 @@
-recursive-include ti842py/utils *.py
+include ti842py/utils/*
