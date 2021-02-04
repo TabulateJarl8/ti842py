@@ -1,5 +1,6 @@
 import re
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARNING)
@@ -48,14 +49,18 @@ class BasicParser(object):
 			raise TypeError("basic must be list or str, not {}".format(str(type(basic))))
 
 		# Utility Functions
-		self.IMPORTS = ["import os", "import time", ""]
-		self.CLEAR = ["def clear():", "\tif os.system(\"clear\") != 0:", "\t\tif os.system(\"cls\") != 0:", "\t\t\tprint(\"Clearing the screen is not supported on this device\")", ""]
+		self.UTILS = {}
+		here = os.path.abspath(os.path.dirname(__file__))
+		for file in os.listdir(os.path.join(here, "utils")):
+			with open(os.path.join(here, "utils", file)) as f:
+				self.UTILS[os.path.splitext(file)[0]] = {}
+				self.UTILS[os.path.splitext(file)[0]]["code"] = [line.rstrip() for line in f.readlines() if not line.startswith("import ")]
+				f.seek(0)
+				self.UTILS[os.path.splitext(file)[0]]["imports"] = [line.rstrip() for line in f.readlines() if line.startswith("import ")]
+				self.UTILS[os.path.splitext(file)[0]]["enabled"] = False
 
 	def toPython(self):
 		pythonCode = []
-		# Add utility functions
-		pythonCode += self.IMPORTS
-		pythonCode += self.CLEAR
 
 		pythonCode += ["def main():"]
 
@@ -104,6 +109,7 @@ class BasicParser(object):
 				indentDecrease = True
 				indentIncrease = True
 			elif line == "ClrHome":
+				self.UTILS["clear"]["enabled"] = True
 				statement = "clear()"
 			elif line == "End":
 				indentDecrease = True
@@ -154,6 +160,11 @@ class BasicParser(object):
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
 				logger.warning("Unknown indentifier on line %s", index)
 
+			# getKey
+			if "getKey" in line:
+				line = line.replace("getKey", "getKey()")
+				self.UTILS["getKey"]["enabled"] = True
+
 			if indentDecrease == True:
 				indentLevel -= 1
 				indentDecrease = False
@@ -167,6 +178,18 @@ class BasicParser(object):
 			if indentIncrease == True:
 				indentLevel += 1
 				indentIncrease = False
+
+		# Add required utility functions
+		neededImports = []
+		for item in self.UTILS:
+			if self.UTILS[item]["enabled"] == True:
+				# Add code to new file
+				pythonCode = self.UTILS[item]["code"] + pythonCode
+				for importedPackage in self.UTILS[item]["imports"]:
+					# Have separate list so that all of the imports are at the top
+					if not importedPackage in neededImports:
+						neededImports.append(importedPackage)
+		pythonCode = neededImports + pythonCode
 
 		pythonCode += ["if __name__ == \"__main__\":", "\tmain()"]
 
