@@ -174,12 +174,15 @@ class BasicParser(object):
 				logger.warning("Unknown indentifier on line %s", index)
 
 			# getKey
-			# TODO: Dont detect getKey if its in a string
 			if "getKey" in statement:
-				statement = re.sub(r"getKey(?!\()", "getKey()", statement)
+				# Replace getKey with getKey() if getKey is not inside of quotes
+				statement = re.sub(r'(?!\B"[^"]*)getKey(?!\()+(?![^"]*"\B)', "getKey()", statement)
 				self.UTILS["getKey"]["enabled"] = True
 			if "[theta]" in statement:
 				statement = statement.replace("[theta]", "theta")
+			if "^" in statement:
+				# Convert every ^ not in a string to **
+				statement = re.sub(r'(?!\B"[^"]*)\^(?![^"]*"\B)', "**", statement)
 
 			if indentDecrease == True:
 				indentLevel -= 1
