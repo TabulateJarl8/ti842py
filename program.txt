@@ -1,0 +1,33 @@
+ClrHome
+Disp "WOW CANT YOU WANT TO EXPERIENCE THE GOODNESS?!?!?
+Disp "WE WILL NOW BE ASSIGNING A VARIABLE
+3->X
+Disp "HERE IS WHAT X IS NOW:", X, "ARENT YOU SO HAPPY
+Disp "LET US TEST SOME THINGS NOW"
+If X=2
+Then
+Disp "X IS 2"
+Else
+If X=4
+Then
+Disp "X IS 4"
+Else
+Disp "X IS NOT 3 OR 4"
+End
+Disp "TEST"
+"Comment
+Input "HI",X
+For(A,0,8,2)
+Disp A
+End
+Disp "yay"
+0->J
+While J<6
+J+1->J
+End
+Disp "J=",J
+0->J
+Repeat J>=6
+J+1->J
+End
+Disp "J=",J

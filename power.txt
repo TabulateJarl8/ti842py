@@ -1,0 +1,56 @@
+Disp "         WORK [1]         "
+Disp ""
+Disp "    POWER WITH WORK [2]   "
+Disp ""
+Disp "  POWER WITHOUT WORK [3]  "
+Disp ""
+Disp "        SPEED [4]        "
+Repeat Z=92 or Z=93 or Z=94 or Z=82
+getKey→Z
+End
+If Z=92
+Then
+Goto 1
+Else
+If Z=93
+Then
+Goto 2
+Else
+If Z=94
+Then
+Goto 3
+Else
+If Z=82
+Then
+Goto 5
+Lbl 1
+ClrHome
+Input "FORCE> ",F
+Input "DISTANCE> ",D
+F*D→X
+Disp X,"JOULES"
+Goto 4
+Lbl 2
+ClrHome
+Input "WORK> ",W
+Input "TIME> ",T
+W/T→X
+Disp X,"WATTS"
+Goto 4
+Lbl 3
+ClrHome
+Input "FORCE> ",F
+Input "DISTANCE> ",D
+Input "TIME> ",T
+F*D→A
+A/T→X
+Disp X,"WATTS"
+Goto 4
+Lbl 5
+ClrHome
+Input "DISTANCE> ",D
+Input "TIME> ",T
+D/T→X
+Disp X
+Goto 4
+Lbl 4
