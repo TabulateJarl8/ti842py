@@ -1,6 +1,6 @@
 import argparse
 import pyparsing
-from parser import BasicParser
+from .tiParser import BasicParser
 
 def transpile(infile, outfile="stdout"):
 

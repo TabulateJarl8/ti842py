@@ -32,7 +32,7 @@ def closeOpen(string):
 			closingChar = ")"
 		newString += c
 	return newString
-	
+
 def fixEquals(string):
 	# Change = to ==
 	return re.sub("(?<![<>!])\=", " == ", string)
@@ -50,13 +50,13 @@ class BasicParser(object):
 		# Utility Functions
 		self.IMPORTS = ["import os", "import time", ""]
 		self.CLEAR = ["def clear():", "\tif os.system(\"clear\") != 0:", "\t\tif os.system(\"cls\") != 0:", "\t\t\tprint(\"Clearing the screen is not supported on this device\")", ""]
-		
+
 	def toPython(self):
 		pythonCode = []
 		# Add utility functions
 		pythonCode += self.IMPORTS
 		pythonCode += self.CLEAR
-		
+
 		pythonCode += ["def main():"]
 
 		indentLevel = 1
@@ -130,14 +130,13 @@ class BasicParser(object):
 			# Pause
 			elif line.startswith("Pause"):
 				args = line[5:].strip().split(",")
-				print(args)
 				if len(args) <= 1:
 					statement = "input("
 					if len(args) == 1:
 						statement += str(args[0]) + ")"
 				else:
 					statement = ["print(" + str(args[0]) + ")", "time.sleep(" + args[1] + ")"]
-			# Wait		
+			# Wait
 			elif line.startswith("Wait"):
 				statement = "time.sleep(" + line[5:] + ")"
 			# Stop
@@ -149,7 +148,7 @@ class BasicParser(object):
 			# Prompt
 			elif line.startswith("Prompt"):
 				variable = line[7:]
-				statement = variable + " = input(\"" + variable + "=?\")"			
+				statement = variable + " = input(\"" + variable + "=?\")"
 
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
@@ -168,7 +167,7 @@ class BasicParser(object):
 			if indentIncrease == True:
 				indentLevel += 1
 				indentIncrease = False
-				
+
 		pythonCode += ["if __name__ == \"__main__\":", "\tmain()"]
 
 		return pythonCode
