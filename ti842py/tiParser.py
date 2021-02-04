@@ -170,14 +170,13 @@ class BasicParser(object):
 			elif line == "getKey":
 				statement = "getKey()"
 			else:
-				print(repr(statement))
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
 				logger.warning("Unknown indentifier on line %s", index)
 
 			# getKey
 			# TODO: Dont detect getKey if its in a string
 			if "getKey" in statement:
-				statement = re.sub(r"getKey[^(]+", "getKey()", statement)
+				statement = re.sub(r"getKey(?!\()", "getKey()", statement)
 				self.UTILS["getKey"]["enabled"] = True
 			if "[theta]" in statement:
 				statement = statement.replace("[theta]", "theta")
