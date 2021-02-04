@@ -123,7 +123,7 @@ class BasicParser(object):
 				if "," in statement[1]:
 					statement = statement[1] + " = [toNumber(number) for number in input(" + closeOpen(statement[0][6:]) + ")]"
 				else:
-					statement = variable + " = toNumber(input(" + closeOpen(statement[0][6:]) + "))"
+					statement = statement[1] + " = toNumber(input(" + closeOpen(statement[0][6:]) + "))"
 				self.UTILS["toNumber"]["enabled"] = True
 			# For loop
 			elif line.startswith("For"):
