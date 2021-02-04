@@ -45,7 +45,7 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
 
 ----
 
-ti842py can currently only be installed by cloning the repository, though there are plans to release it on PyPI once it gets more stable. Currently, you can install it by cloning the repository and running `python setup.py install --user`.
+ti842py can be installed via PyPI or by cloning the repository. To install it with PyPI, just run `pip3 install ti842py` in a terminal. To install it locally, you can clone the repository and run `python setup.py install --user`.
 
 # Usage
 
