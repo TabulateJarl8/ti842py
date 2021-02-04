@@ -161,8 +161,8 @@ class BasicParser(object):
 				logger.warning("Unknown indentifier on line %s", index)
 
 			# getKey
-			if "getKey" in line:
-				line = line.replace("getKey", "getKey()")
+			if "getKey" in statement:
+				statement = statement.replace("getKey", "getKey()")
 				self.UTILS["getKey"]["enabled"] = True
 
 			if indentDecrease == True:
