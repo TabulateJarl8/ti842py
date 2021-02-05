@@ -3,7 +3,6 @@ import os
 
 install_requires = [
 	"basically-ti-basic>=0.1.4",
-	"goto-statement @ https://github.com/TabulateJarl8/python-goto/archive/patch-2.zip#egg=goto_statement-1.2"
 ]
 
 with open("README.md", "r") as fh:
