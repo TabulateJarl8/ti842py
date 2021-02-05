@@ -49,7 +49,7 @@ class BasicParser(object):
 			raise TypeError("basic must be list or str, not {}".format(str(type(basic))))
 
 		# Utility Functions
-		self.UTILS = {"goto": {"code": [""], "imports": ["from goto import with_goto"], "enabled": False}}
+		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}}
 		here = os.path.abspath(os.path.dirname(__file__))
 		for file in [file for file in os.listdir(os.path.join(here, "utils")) if os.path.isfile(os.path.join(here, "utils", file))]:
 			with open(os.path.join(here, "utils", file)) as f:
@@ -157,9 +157,11 @@ class BasicParser(object):
 						statement += str(args[0]) + ")"
 				else:
 					statement = ["print(" + str(args[0]) + ")", "time.sleep(" + args[1] + ")"]
+					self.UTILS["wait"]["enabled"] = True
 			# Wait
 			elif line.startswith("Wait"):
 				statement = "time.sleep(" + line[5:] + ")"
+				self.UTILS["wait"]["enabled"] = True
 			# Stop
 			elif line == "Stop":
 				statement = "exit()"
