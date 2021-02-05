@@ -33,5 +33,6 @@ End
 Disp "J=",J
 Pause "PRESS ENTER"
 Disp "NOW WAIT"
-Wait 5
+Wait 2
 Prompt X
+Output(70, 1, "HI"

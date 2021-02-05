@@ -32,8 +32,7 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
  - `Goto`
  - `Lbl`
  - `getDate` and `getTime`
-<!-- - [`Goto`](#goto)
- - [`Lbl`](#goto)-->
+ - `Output()`
 
 ### Planned Features
  - `IS>(`
@@ -41,19 +40,16 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
  - `Return`
  - `eval()`/`expr()`
  - `toString()`
- - `Output()`
  - `Ans`
  - `Menu()`
  - List subscripting
+ - Indentation with `:`
 
 # Installation
 
 ----
 
 ti842py can be installed via PyPI or by cloning the repository. To install it with PyPI, just run `pip3 install ti842py` in a terminal. To install it locally, you can clone the repository and run `python setup.py install --user`.
-
-<!--### <a name="goto"></a>Goto:
-To have support for goto and lbl, you need to run `pip3 install git+https://github.com/TabulateJarl8/python-goto.git@patch-2`. This is because PyPI will not allow users to install packages from outside sources.-->
 
 # Usage
 

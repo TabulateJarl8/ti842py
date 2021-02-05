@@ -186,6 +186,16 @@ class BasicParser(object):
 			elif line.startswith("Lbl "):
 				statement = "label .lbl" + line[4:]
 				self.UTILS["goto"]["enabled"] = True
+			# Output
+			elif line.startswith("Output("):
+				statement = line[7:]
+				statement = statement.split(",")
+				if statement[-1].count("\"") > 1:
+					statement[-1] = re.findall('"([^"]*)"', statement[-1])[0]
+				else:
+					statement[-1] = statement[-1].strip(" ")[1:]
+				statement = "output(" + statement[1].strip(" ") + ", " + statement[0].strip(" ") + ", \"" + statement[-1] + "\")"
+				self.UTILS["output"]["enabled"] = True
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
 				logger.warning("Unknown indentifier on line %s", index)
