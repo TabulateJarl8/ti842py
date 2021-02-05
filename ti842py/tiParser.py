@@ -54,9 +54,9 @@ class BasicParser(object):
 		for file in [file for file in os.listdir(os.path.join(here, "utils")) if os.path.isfile(os.path.join(here, "utils", file))]:
 			with open(os.path.join(here, "utils", file)) as f:
 				self.UTILS[os.path.splitext(file)[0]] = {}
-				self.UTILS[os.path.splitext(file)[0]]["code"] = [line.rstrip() for line in f.readlines() if not line.startswith("import ")]
+				self.UTILS[os.path.splitext(file)[0]]["code"] = [line.rstrip() for line in f.readlines() if not line.startswith("import ") and not line.startswith("from ")]
 				f.seek(0)
-				self.UTILS[os.path.splitext(file)[0]]["imports"] = [line.rstrip() for line in f.readlines() if line.startswith("import ")]
+				self.UTILS[os.path.splitext(file)[0]]["imports"] = [line.rstrip() for line in f.readlines() if line.startswith("import ") or line.startswith("from ")]
 				self.UTILS[os.path.splitext(file)[0]]["enabled"] = False
 
 	def toPython(self):
@@ -73,7 +73,7 @@ class BasicParser(object):
 		for index, line in enumerate(self.basic):
 			statement = ""
 			# TODO: Make rules for :, dont fully understand it yet
-			if line.startswith("\"") or line.startswith(":"):
+			if line.startswith("\""):
 				# Comments
 				statement = "# " + line.lstrip("\"")
 			elif skipLine == True:
@@ -205,6 +205,14 @@ class BasicParser(object):
 			if "–" in statement:
 				# Remove long dash if not in string
 				statement = re.sub(r'(?!\B"[^"]*)–(?![^"]*"\B)', "-", statement)
+			if "getTime" in statement:
+				# Replace getTime with getTime() if getTime is not inside of quotes
+				statement = re.sub(r'(?!\B"[^"]*)getTime(?!\()+(?![^"]*"\B)', "getTime()", statement)
+				self.UTILS["getDateTime"]["enabled"] = True
+			if "getDate" in statement:
+				# Replace getDate with getDate() if getDate is not inside of quotes
+				statement = re.sub(r'(?!\B"[^"]*)getDate(?!\()+(?![^"]*"\B)', "getDate()", statement)
+				self.UTILS["getDateTime"]["enabled"] = True
 
 			if indentDecrease == True:
 				indentLevel -= 1
