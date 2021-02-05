@@ -29,10 +29,10 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
  - `DelVar`
  - `Prompt`
  - `getKey`
-
-### Planned Features
  - `Goto`
  - `Lbl`
+
+### Planned Features
  - `IS>(`
  - `DS<(`
  - `Return`

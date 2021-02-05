@@ -2,7 +2,8 @@ import setuptools
 import os
 
 install_requires = [
-	"basically-ti-basic>=0.1.4"
+	"basically-ti-basic>=0.1.4",
+	"git+https://github.com/TabulateJarl8/python-goto.git@patch-2"
 ]
 
 with open("README.md", "r") as fh:

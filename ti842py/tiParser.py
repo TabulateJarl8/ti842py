@@ -49,7 +49,7 @@ class BasicParser(object):
 			raise TypeError("basic must be list or str, not {}".format(str(type(basic))))
 
 		# Utility Functions
-		self.UTILS = {}
+		self.UTILS = {"goto": {"code": [""], "imports": ["from goto import with_goto"], "enabled": False}}
 		here = os.path.abspath(os.path.dirname(__file__))
 		for file in [file for file in os.listdir(os.path.join(here, "utils")) if os.path.isfile(os.path.join(here, "utils", file))]:
 			with open(os.path.join(here, "utils", file)) as f:
@@ -120,10 +120,17 @@ class BasicParser(object):
 			# Input
 			elif line.startswith("Input"):
 				statement = line.split(",")
-				if "," in statement[1]:
-					statement = statement[1] + " = [toNumber(number) for number in input(" + closeOpen(statement[0][6:]) + ")]"
+				if len(statement) > 1:
+					if "," in statement[1]:
+						statement = statement[1] + " = [toNumber(number) for number in input(" + closeOpen(statement[0][6:]) + ")]"
+					else:
+						statement = statement[1] + " = toNumber(input(" + closeOpen(statement[0][6:]) + "))"
 				else:
-					statement = statement[1] + " = toNumber(input(" + closeOpen(statement[0][6:]) + "))"
+					if statement[0].strip() != "Input":
+						# No input text
+						statement = statement[0][6:] + " = toNumber(input(\"?\"))"
+					else:
+						statement = "input()"
 				self.UTILS["toNumber"]["enabled"] = True
 			# For loop
 			elif line.startswith("For"):
@@ -169,20 +176,33 @@ class BasicParser(object):
 				self.UTILS["toNumber"]["enabled"] = True
 			elif line == "getKey":
 				statement = "getKey()"
+			# Goto (eww)
+			elif line.startswith("Goto "):
+				statement = "goto .lbl" + line[5:]
+				self.UTILS["goto"]["enabled"] = True
+			# Lbl
+			elif line.startswith("Lbl "):
+				statement = "label .lbl" + line[4:]
+				self.UTILS["goto"]["enabled"] = True
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
 				logger.warning("Unknown indentifier on line %s", index)
 
-			# getKey
+			# Fix things contained within statement
+
 			if "getKey" in statement:
 				# Replace getKey with getKey() if getKey is not inside of quotes
 				statement = re.sub(r'(?!\B"[^"]*)getKey(?!\()+(?![^"]*"\B)', "getKey()", statement)
 				self.UTILS["getKey"]["enabled"] = True
 			if "[theta]" in statement:
-				statement = statement.replace("[theta]", "theta")
+				# Replace [theta] with theta if [theta] is not inside of quotes
+				statement = re.sub(r'(?!\B"[^"]*)\[theta\](?![^"]*"\B)', "theta", statement)
 			if "^" in statement:
 				# Convert every ^ not in a string to **
 				statement = re.sub(r'(?!\B"[^"]*)\^(?![^"]*"\B)', "**", statement)
+			if "–" in statement:
+				# Remove long dash if not in string
+				statement = re.sub(r'(?!\B"[^"]*)–(?![^"]*"\B)', "-", statement)
 
 			if indentDecrease == True:
 				indentLevel -= 1
@@ -197,6 +217,10 @@ class BasicParser(object):
 			if indentIncrease == True:
 				indentLevel += 1
 				indentIncrease = False
+
+		# Decorate main with with_goto if goto is used
+		if self.UTILS["goto"]["enabled"] == True:
+			pythonCode.insert(0, "@with_goto")
 
 		# Add required utility functions
 		neededImports = []
