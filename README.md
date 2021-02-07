@@ -33,10 +33,10 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
  - `Lbl`
  - `getDate` and `getTime`
  - `Output()`
-
-### Planned Features
  - `IS>(`
  - `DS<(`
+
+### Planned Features
  - `Return`
  - `eval()`/`expr()`
  - `toString()`
@@ -84,3 +84,5 @@ The last way that ti842py can be ran is by running the main python file. After c
 ----
 
  - `getKey` - The `getKey` function works just like it does in normal TI-BASIC, except with some special rules. Any key on the keyboard pressed will be converted to the corresponding key on the calculator. This works for letters, numbers, arrow keys, enter, delete, and symbols. As for the buttons not on a keyboard, the top 5 keys are the F1-F5 keys on the keyboard, `2nd` is alt, and `alpha` is ctrl. `mode` is F6, `stat` is f7, `vars` is F8, `clear` is F9, and the `X,T,θ,n` key is F10.
+
+ - `If` - `If` blocks must be ended with `End`, they cannot be left open

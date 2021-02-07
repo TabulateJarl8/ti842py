@@ -35,4 +35,12 @@ Pause "PRESS ENTER"
 Disp "NOW WAIT"
 Wait 2
 Prompt X
-Output(70, 1, "HI"
+Output(70, 1, "X")
+1->A
+DS<(A,6)
+Disp "> 6"
+Disp "NOT> 6"
+7->A
+IS>(A,6)
+Disp "NOT > 6"
+Disp "> 6"
