@@ -3,6 +3,7 @@ import os
 
 install_requires = [
 	"basically-ti-basic>=0.1.4",
+	"keyboard>=0.13.5"
 ]
 
 with open("README.md", "r") as fh:
