@@ -35,8 +35,6 @@ def closeOpen(string):
 		newString += c
 	return newString
 
-from dialog import Dialog
-
 def menu(title, args):
 	choices = []
 	for i in range(0, len(args), 2):

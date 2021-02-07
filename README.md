@@ -49,10 +49,10 @@ ti842py can be installed via PyPI or by cloning the repository. To install it wi
 
 ----
 
-ti842py can be used in 3 different ways. The first way is just running it from the command line. For example, if you wanted to convert the program in `tiprogram.txt` to `tiprogram.py`, you can this command: `ti842py -i tiprogram.txt -o tiprogram.py`. If no value is specified for `-o`, the converted program will be written to `stdout`. The `-n` flag can be added to force the transpiler to not decompile the input file, and the `-d` flag can be added to force the transpiler to attempt and decompile the input file
+ti842py can be used in 3 different ways. The first way is just running it from the command line. For example, if you wanted to convert the program in `tiprogram.txt` to `tiprogram.py`, you can this command: `ti842py -i tiprogram.txt -o tiprogram.py`. If no value is specified for `-o`, the converted program will be written to `stdout`. The `-n` flag can be added to force the transpiler to not decompile the input file, and the `-d` flag can be added to force the transpiler to attempt and decompile the input file. If the `--run` or `-r` argument is supplied, the resulting python file will be run after it is done transpiling
 
 ```
-usage: ti842py [-h] [-o O] -i I [-n] [-d]
+usage: ti842py [-h] [-o O] -i I [-n] [-d] [-r]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -61,6 +61,7 @@ optional arguments:
   -n, --force-normal    Forces the program to not attempt and decompile the input file. Useful for false positives
   -d, --force-decompile
                         Forces the program to attempt to decompile the input file
+  -r, --run             Runs the program after it's done transpiling. Will not print to stdout
 ```
 
 ti842py can also be imported and used in a program. Here is an example program to convert `tiprogram.txt` to `tiprogram.py`:
@@ -70,7 +71,7 @@ from ti842py import transpile
 
 transpile("tiprogram.txt", "tiprogram.py")
 ```
-Again, if the second argument is not supplied, the program will be written to `stdout`. The `transpile` command can be supplied with 2 optional arguments, `decompileFile` and `forceDecompile`. `decompileFile` defaults to `True`, and `forceDecompile` defaults to `False`
+Again, if the second argument is not supplied, the program will be written to `stdout`. The `transpile` command can be supplied with 3 optional arguments, `decompileFile`, `forceDecompile`, and `run`. `decompileFile` defaults to `True`, and `forceDecompile` and `run` default to `False`
 
 The last way that ti842py can be ran is by running the main python file. After cloning the repository, cd into the repository and run `python ti842py/main.py -i inputfile.txt`. You can supply any arguments that you would supply with the `ti842py` command.
 
