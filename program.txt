@@ -44,3 +44,4 @@ Disp "NOT> 6"
 IS>(A,6)
 Disp "NOT > 6"
 Disp "> 6"
+sqrt(6+3)

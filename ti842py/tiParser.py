@@ -64,7 +64,7 @@ class BasicParser(object):
 			raise TypeError("basic must be list or str, not {}".format(str(type(basic))))
 
 		# Utility Functions
-		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}}
+		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}, "math": {"code": [""], "imports": ["import math"], "enabled": False}}
 		here = os.path.abspath(os.path.dirname(__file__))
 		for file in [file for file in os.listdir(os.path.join(here, "utils")) if os.path.isfile(os.path.join(here, "utils", file))]:
 			with open(os.path.join(here, "utils", file)) as f:
@@ -180,8 +180,6 @@ class BasicParser(object):
 			else:
 				statement = variable + " = toNumber(input(\"" + variable + "=?\"))"
 			self.UTILS["toNumber"]["enabled"] = True
-		elif line == "getKey":
-			statement = "getKey()"
 		# Goto (eww)
 		elif line.startswith("Goto "):
 			statement = "goto .lbl" + line[5:]
@@ -223,8 +221,12 @@ class BasicParser(object):
 			statement = menu(title, options)
 			self.UTILS["menu"]["enabled"] = True
 		else:
-			statement = "# UNKNOWN INDENTIFIER: {}".format(line)
-			logger.warning("Unknown indentifier on line %s", index)
+			# Things that can be alone on a line
+			if line.startswith("getKey") or line.startswith("abs") or line.startswith("sqrt"):
+				statement = line
+			else:
+				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
+				logger.warning("Unknown indentifier on line %s", index)
 
 		# Fix things contained within statement
 
@@ -249,7 +251,10 @@ class BasicParser(object):
 			# Replace getDate with getDate() if getDate is not inside of quotes
 			statement = re.sub(r'(?!\B"[^"]*)getDate(?!\()+(?![^"]*"\B)', "getDate()", statement)
 			self.UTILS["getDateTime"]["enabled"] = True
-
+		if "sqrt(" in statement:
+			# Replace sqrt with math.sqrt if sqrt is not inside of quotes
+			statement = re.sub(r'(?!\B"[^"]*)sqrt(?![^"]*"\B)', "math.sqrt", statement)
+			self.UTILS["math"]["enabled"] = True
 		return statement
 
 	def toPython(self):
