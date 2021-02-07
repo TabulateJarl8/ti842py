@@ -1,6 +1,7 @@
 import re
 import logging
 import os
+import shutil
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARNING)
@@ -34,9 +35,25 @@ def closeOpen(string):
 		newString += c
 	return newString
 
+from dialog import Dialog
+
+def menu(title, args):
+	choices = []
+	for i in range(0, len(args), 2):
+		choices.append((str((i // 2) + 1) + ".", str(args[i])))
+
+	# Convert args to dict
+	args = {str((i // 2) + 1) + ".": args[i + 1] for i in range(0, len(args), 2)}
+
+	ifstmt = ["d = dialog.Dialog()", "menu = d.menu(\"" + title + "\", choices=" + str(choices) + ")"]
+	for key in args:
+		ifstmt.extend(["if menu[1] == \"" + str(key) + "\":", "\tgoto .lbl" + str(args[key])])
+
+	return ifstmt
+
 def fixEquals(string):
-	# Change = to ==
-	return re.sub("(?<![<>!])\=", " == ", string)
+	# Change = to == if not between quotes
+	return re.sub(r'(?!\B"[^"]*)(?<![<>!])\=(?!\()+(?![^"]*"\B)', " == ", string)
 
 
 class BasicParser(object):
@@ -49,7 +66,7 @@ class BasicParser(object):
 			raise TypeError("basic must be list or str, not {}".format(str(type(basic))))
 
 		# Utility Functions
-		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}}
+		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}}
 		here = os.path.abspath(os.path.dirname(__file__))
 		for file in [file for file in os.listdir(os.path.join(here, "utils")) if os.path.isfile(os.path.join(here, "utils", file))]:
 			with open(os.path.join(here, "utils", file)) as f:
@@ -196,6 +213,17 @@ class BasicParser(object):
 			variable, value = line[3:].strip("()").split(",")
 			statement = ["if " + variable + " + 1 <= " + value + ":", "\t" + self.convertLine(index + 1, self.basic[index + 1])]
 			self.skipLine = 1
+		# Menu
+		elif line.startswith("Menu"):
+			if shutil.which("dialog") == None:
+				logger.warning("dialog executable not found. Please install dialog to use menus")
+			tiMenu = line[4:].strip("()").split(",")
+			title = tiMenu.pop(0).strip(" \"")
+			options = []
+			for i in range(0, len(tiMenu), 2):
+				options.extend([tiMenu[i].strip(" \""), tiMenu[i + 1].strip(" \"")])
+			statement = menu(title, options)
+			self.UTILS["menu"]["enabled"] = True
 		else:
 			statement = "# UNKNOWN INDENTIFIER: {}".format(line)
 			logger.warning("Unknown indentifier on line %s", index)
@@ -227,9 +255,9 @@ class BasicParser(object):
 		return statement
 
 	def toPython(self):
-		pythonCode = []
+		self.pythonCode = []
 
-		pythonCode += ["def main():"]
+		self.pythonCode += ["def main():"]
 
 		self.indentLevel = 1
 		# indentIncrease increases the indent on the next line
@@ -252,10 +280,10 @@ class BasicParser(object):
 
 			# Append converted line to list of code
 			if isinstance(statement, str):
-				pythonCode.append("\t"*self.indentLevel + statement)
+				self.pythonCode.append("\t"*self.indentLevel + statement)
 			elif isinstance(statement, list):
 				for item in statement:
-					pythonCode.append("\t"*self.indentLevel + item)
+					self.pythonCode.append("\t"*self.indentLevel + item)
 
 			# Indentation
 			if self.indentIncrease == True:
@@ -264,20 +292,20 @@ class BasicParser(object):
 
 		# Decorate main with with_goto if goto is used
 		if self.UTILS["goto"]["enabled"] == True:
-			pythonCode.insert(0, "@with_goto")
+			self.pythonCode.insert(0, "@with_goto")
 
 		# Add required utility functions
 		neededImports = []
 		for item in self.UTILS:
 			if self.UTILS[item]["enabled"] == True:
 				# Add code to new file
-				pythonCode = self.UTILS[item]["code"] + pythonCode
+				self.pythonCode = self.UTILS[item]["code"] + self.pythonCode
 				for importedPackage in self.UTILS[item]["imports"]:
 					# Have separate list so that all of the imports are at the top
 					if not importedPackage in neededImports:
 						neededImports.append(importedPackage)
-		pythonCode = neededImports + pythonCode
+		self.pythonCode = neededImports + self.pythonCode
 
-		pythonCode += ["if __name__ == \"__main__\":", "\tmain()"]
+		self.pythonCode += ["if __name__ == \"__main__\":", "\tmain()"]
 
-		return pythonCode
+		return self.pythonCode

@@ -15,33 +15,27 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
 ----
 
  - Converts string literals to comments
- - `Disp`
+ - `Disp`/`Output()`
  - Variable assignment
  - `If/Then/Else` statements, including `Else If`
  - `ClrHome`
- - `Input`
- - For loops
- - While loops
- - Repeat loops
+ - `Input`/`Prompt`
+ - For, While, and Repeat loops
  - `Pause`
  - `Wait`
  - `Stop`
  - `DelVar`
- - `Prompt`
  - `getKey`
- - `Goto`
- - `Lbl`
+ - `Goto`/`Lbl`
  - `getDate` and `getTime`
- - `Output()`
- - `IS>(`
- - `DS<(`
+ - `IS>(`/`DS<(`
+ - `Menu()`
 
 ### Planned Features
  - `Return`
  - `eval()`/`expr()`
  - `toString()`
  - `Ans`
- - `Menu()`
  - List subscripting
  - Indentation with `:`
 
