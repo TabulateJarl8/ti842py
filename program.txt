@@ -45,3 +45,6 @@ IS>(A,6)
 Disp "NOT > 6"
 Disp "> 6"
 sqrt(6+3)
+If 3+3=6:Disp "GOOD"
+If 3+5=6
+Disp "no"

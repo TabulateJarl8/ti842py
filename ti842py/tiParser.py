@@ -97,10 +97,23 @@ class BasicParser(object):
 			statement = " = ".join(statement)
 		# If
 		elif line.startswith("If "):
-			statement = "if " + line.lstrip("If ")
-			statement = fixEquals(statement)
-			statement = statement + ":"
-			self.indentIncrease = True
+			try:
+				if self.basic[index + 1] == "Then":
+					# If/Then statement
+					statement = "if " + line.lstrip("If ")
+					statement = fixEquals(statement)
+					statement = statement + ":"
+					self.indentIncrease = True
+				elif re.search(r"If.*[^\"]:", line) != None:
+					# If statement on 1 line
+					statement = ["if " + line.lstrip("If ").split(":", 1)[0] + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
+				else:
+					# If statement on 2 lines; no Then
+					statement = ["if " + line.lstrip("If ") + ":", '\t' + self.convertLine(index + 1, self.basic[index + 1])]
+			except IndexError:
+				# Last line in file, test for 1 line If statement
+				if re.search(r"If.*[^\"]:", line) != None:
+					statement = ["if " + line.lstrip("If ").split(":", 1)[0] + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
 		elif line == "Then":
 			return None
 		# Elif
