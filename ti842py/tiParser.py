@@ -235,7 +235,7 @@ class BasicParser(object):
 			self.UTILS["menu"]["enabled"] = True
 		else:
 			# Things that can be alone on a line
-			if line.startswith("getKey") or line.startswith("abs") or line.startswith("sqrt"):
+			if line.startswith("getKey") or line.startswith("abs") or line.startswith("sqrt") or line.startswith("toString("):
 				statement = line
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
@@ -268,6 +268,9 @@ class BasicParser(object):
 			# Replace sqrt with math.sqrt if sqrt is not inside of quotes
 			statement = re.sub(r'(?!\B"[^"]*)sqrt(?![^"]*"\B)', "math.sqrt", statement)
 			self.UTILS["math"]["enabled"] = True
+		if "toString(" in statement:
+			# Replace toString() with str() if toString() is not inside of quotes
+			statement = re.sub(r'toString\(([^\)]+)\)', r'str(\1)', statement)
 		return statement
 
 	def toPython(self):
