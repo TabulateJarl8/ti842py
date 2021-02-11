@@ -30,11 +30,11 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
  - `getDate` and `getTime`
  - `IS>(`/`DS<(`
  - `Menu()`
+ - `toString()`
 
 ### Planned Features
  - `Return`
  - `eval()`/`expr()`
- - `toString()`
  - `Ans`
  - List subscripting
  - Indentation with `:`
