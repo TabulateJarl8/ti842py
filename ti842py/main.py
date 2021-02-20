@@ -3,6 +3,8 @@ import basically_ti_basic as btb
 import os
 import tempfile
 import sys
+import subprocess
+
 try:
 	from .tiParser import BasicParser
 except:
@@ -16,6 +18,8 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		# Decompile 8Xp file
 		try:
 			temp_name = next(tempfile._get_candidate_names())
+			while os.path.exists(temp_name):
+				temp_name = next(tempfile._get_candidate_names())
 			btb.decompile_file(infile, temp_name)
 			with open(temp_name, 'r') as f:
 				pythonCode = BasicParser([line.strip() for line in f.readlines()]).toPython()
@@ -38,11 +42,17 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 			print("\n".join(pythonCode))
 		else:
 			temp_name = next(tempfile._get_candidate_names())
+			while os.path.exists(temp_name):
+				temp_name = next(tempfile._get_candidate_names())
 			with open(temp_name, "w+") as f:
 				for line in pythonCode:
 					f.write(line + "\n")
 				f.seek(0)
-				os.system(sys.executable + " " + temp_name)
+				proc = subprocess.Popen([sys.executable, temp_name])
+				try:
+					proc.wait()
+				except Exception:
+					proc.terminate()
 			os.remove(temp_name)
 	else:
 		with open(outfile, 'w') as f:
