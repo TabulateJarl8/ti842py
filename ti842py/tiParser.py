@@ -7,6 +7,8 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARNING)
 
 def closeOpen(string):
+	# TODO: Fix overwriting on strings
+	# `Output(3,1,"Masses, heavy to light, in kilograms.Assumes no friction and vi 0"` becomes `output(1, 3, "n kilograms.Assumes no friction and vi 0"")`
 	newString = ""
 	# Function for closing open quotation marks/parenthesis
 	open = False
@@ -106,14 +108,14 @@ class BasicParser(object):
 					self.indentIncrease = True
 				elif re.search(r"If.*[^\"]:", line) != None:
 					# If statement on 1 line
-					statement = ["if " + line.lstrip("If ").split(":", 1)[0] + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
+					statement = ["if " + fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
 				else:
 					# If statement on 2 lines; no Then
-					statement = ["if " + line.lstrip("If ") + ":", '\t' + self.convertLine(index + 1, self.basic[index + 1])]
+					statement = ["if " + fixEquals(line.lstrip("If ")) + ":", '\t' + self.convertLine(index + 1, self.basic[index + 1])]
 			except IndexError:
 				# Last line in file, test for 1 line If statement
 				if re.search(r"If.*[^\"]:", line) != None:
-					statement = ["if " + line.lstrip("If ").split(":", 1)[0] + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
+					statement = ["if " + fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
 		elif line == "Then":
 			return None
 		# Elif
@@ -186,6 +188,7 @@ class BasicParser(object):
 		elif line.startswith("DelVar"):
 			statement = "del " + line[7:]
 		# Prompt
+		# TODO: Fix prompt after Output going over output
 		elif line.startswith("Prompt"):
 			variable = line[7:]
 			if "," in variable:

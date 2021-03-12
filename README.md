@@ -39,6 +39,10 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
  - List subscripting
  - Indentation with `:`
 
+### Known issues
+ - Closing strings that have been left open breaks sometimes
+ - Calling `Prompt` after `Output` will write to STDOUT over the Output
+
 # Installation
 
 ----
@@ -80,4 +84,4 @@ The last way that ti842py can be ran is by running the main python file. After c
 
  - `getKey` - The `getKey` function works just like it does in normal TI-BASIC, except with some special rules. Any key on the keyboard pressed will be converted to the corresponding key on the calculator. This works for letters, numbers, arrow keys, enter, delete, and symbols. As for the buttons not on a keyboard, the top 5 keys are the F1-F5 keys on the keyboard, `2nd` is alt, and `alpha` is ctrl. `mode` is F6, `stat` is f7, `vars` is F8, `clear` is F9, and the `X,T,θ,n` key is F10.
 
- - `If` - `If` blocks must be ended with `End`, they cannot be left open
+ - `If` - `If` blocks with `Then` after the `If` must be ended with `End`, they cannot be left open. `If` blocks on 2 lines without a `Then` cannot be closed with `End`
