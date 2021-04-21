@@ -55,6 +55,29 @@ def fixEquals(string):
 	# Change = to == if not between quotes
 	return re.sub(r'(?!\B"[^"]*)(?<![<>!])\=(?!\()+(?![^"]*"\B)', " == ", string)
 
+def parenthesis_split(sentence,separator=" ",lparen="(",rparen=")"):
+	nb_brackets=0
+	sentence = sentence.strip(separator) # get rid of leading/trailing seps
+
+	l = [0]
+	for i, c in enumerate(sentence):
+		if c == lparen:
+			nb_brackets += 1
+		elif c == rparen:
+			nb_brackets -= 1
+		elif c == separator and nb_brackets == 0:
+			l.append(i)
+		# handle malformed string
+		if nb_brackets < 0:
+			raise Exception("Syntax error")
+
+	l.append(len(sentence))
+	# handle missing closing parentheses
+	if nb_brackets>0:
+		raise Exception("Syntax error")
+
+	return([sentence[i:j].strip(separator) for i,j in zip(l,l[1:])])
+
 
 class BasicParser(object):
 	def __init__(self, basic):
@@ -66,7 +89,7 @@ class BasicParser(object):
 			raise TypeError("basic must be list or str, not {}".format(str(type(basic))))
 
 		# Utility Functions
-		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}, "math": {"code": [""], "imports": ["import math"], "enabled": False}}
+		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}, "math": {"code": [""], "imports": ["import math"], "enabled": False}, 'random': {'code': [''], 'imports': ['import random'], 'enabled': False}}
 		here = os.path.abspath(os.path.dirname(__file__))
 		for file in [file for file in os.listdir(os.path.join(here, "utils")) if os.path.isfile(os.path.join(here, "utils", file))]:
 			with open(os.path.join(here, "utils", file)) as f:
@@ -238,7 +261,7 @@ class BasicParser(object):
 			self.UTILS["menu"]["enabled"] = True
 		else:
 			# Things that can be alone on a line
-			if line.startswith("getKey") or line.startswith("abs") or line.startswith("sqrt") or line.startswith("toString("):
+			if line.startswith("getKey") or line.startswith("abs") or line.startswith("sqrt") or line.startswith("toString(") or line.startswith('randInt('):
 				statement = line
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
@@ -274,6 +297,22 @@ class BasicParser(object):
 		if "toString(" in statement:
 			# Replace toString() with str() if toString() is not inside of quotes
 			statement = re.sub(r'toString\(([^\)]+)\)', r'str(\1)', statement)
+		if 'randInt(' in statement:
+			# Replace randInt with random.randint
+			statement = re.sub('randInt', 'random.randint', statement)
+
+			split_statement = parenthesis_split(closeOpen(statement))
+
+			for i in range(len((split_statement))):
+				if 'random.randint' in split_statement[i]:
+					args = re.search(r'random\.randint\((.*?)\)', split_statement[i]).group(1).replace(' ', '').split(',') # get data in between parentheses
+					if len(args) >= 3:
+						# Generate args[2] amount of random numbers
+						split_statement[i] = re.sub(r'random\.randint\(.*?\)', '[random.randint(' + args[0] + ', ' + args[1] + ') for i in range(' + args[2] + ')]', split_statement[i])
+
+			statement = ' '.join(split_statement)
+
+			self.UTILS['random']['enabled'] = True
 		return statement
 
 	def toPython(self):

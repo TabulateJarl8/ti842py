@@ -31,13 +31,13 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
  - `IS>(`/`DS<(`
  - `Menu()`
  - `toString()`
-
+ - `randInt()`
+ 
 ### Planned Features
  - `Return`
  - `eval()`/`expr()`
  - `Ans`
  - List subscripting
- - Indentation with `:`
 
 ### Known issues
  - Closing strings that have been left open breaks sometimes
