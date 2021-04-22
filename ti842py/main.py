@@ -6,9 +6,9 @@ import sys
 import subprocess
 
 try:
-	from .tiParser import BasicParser
+	from .tiParser import TIBasicParser
 except:
-	from tiParser import BasicParser
+	from tiParser import TIBasicParser
 
 def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, run=False):
 
@@ -22,7 +22,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 				temp_name = next(tempfile._get_candidate_names())
 			btb.decompile_file(infile, temp_name)
 			with open(temp_name, 'r') as f:
-				pythonCode = BasicParser([line.strip() for line in f.readlines()]).toPython()
+				pythonCode = TIBasicParser([line.strip() for line in f.readlines()]).toPython()
 		finally:
 			os.remove(temp_name)
 
@@ -34,26 +34,22 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with open(infile, 'r') as f:
 			file_lines = [line.strip() for line in f.readlines()]
 
-		pythonCode = BasicParser(file_lines).toPython()
+		pythonCode = TIBasicParser(file_lines).toPython()
 
 	# Write to outfile
 	if outfile == "stdout":
 		if run == False:
 			print("\n".join(pythonCode))
 		else:
-			temp_name = next(tempfile._get_candidate_names())
-			while os.path.exists(temp_name):
-				temp_name = next(tempfile._get_candidate_names())
-			with open(temp_name, "w+") as f:
+			with tempfile.NamedTemporaryFile() as f:
 				for line in pythonCode:
-					f.write(line + "\n")
+					f.write(line.encode() + b"\n")
 				f.seek(0)
-				proc = subprocess.Popen([sys.executable, temp_name])
+				proc = subprocess.Popen([sys.executable, f.name])
 				try:
 					proc.wait()
-				except Exception:
+				except:
 					proc.terminate()
-			os.remove(temp_name)
 	else:
 		with open(outfile, 'w') as f:
 			for line in pythonCode:

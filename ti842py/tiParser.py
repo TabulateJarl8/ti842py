@@ -79,7 +79,7 @@ def parenthesis_split(sentence,separator=" ",lparen="(",rparen=")"):
 	return([sentence[i:j].strip(separator) for i,j in zip(l,l[1:])])
 
 
-class BasicParser(object):
+class TIBasicParser(object):
 	def __init__(self, basic):
 		if isinstance(basic, list):
 			self.basic = basic
