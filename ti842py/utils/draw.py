@@ -5,6 +5,7 @@ import time
 class Draw:
 	def __init__(self):
 		self.win = None
+		self.winOpen = False
 		self.pixels = {}
 		self.points = {}
 		self.colors = {'BLUE': 'blue', 'RED': 'red', 'BLACK': 'black', 'MAGENTA': 'magenta', 'GREEN': 'green', 'ORANGE': 'orange', 'BROWN': 'brown', 'NAVY': 'navy', 'LTBLUE': 'light sky blue', 'YELLOW': 'yellow', 'WHITE': 'white', 'LTGRAY': 'light gray', 'MEDGRAY': 'dark gray', 'GRAY': 'gray', 'DARKGRAY': 'dark slate gray'}
@@ -20,11 +21,15 @@ class Draw:
 	def openWindow(self):
 		# The TI-84 Plus CE has a graph resolution of 250x160 pixels
 		# Not to be confused with the screen resolution of 320x240 pixels
-		self.win = GraphWin('ti842py', 250, 160)
-		self.win.setBackground('white')
+		if self.winOpen is False:
+			self.win = GraphWin('ti842py', 250, 160)
+			self.win.setBackground('white')
+			self.winOpen = True
 
 	def closeWindow(self):
-		self.win.close()
+		if self.winOpen is True:
+			self.win.close()
+			self.winOpen = False
 
 	def graphCoordsToPixels(self, x, y, minX=-10, maxX=10, minY=-10, maxY=10):
 		# Can work for vertical or horizontal coords

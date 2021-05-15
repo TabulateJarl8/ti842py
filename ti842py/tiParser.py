@@ -326,9 +326,14 @@ class TIBasicParser(object):
 			statement = closeOpen(line.replace('TextColor(', 'draw.textColor('))
 			self.UTILS['draw']['enabled'] = True
 
+		# DispGraph
+		elif line == 'DispGraph':
+			statement = 'draw.openWindow()'
+			self.UTILS['draw']['enabled'] = True
+
 		else:
 			# Things that can be alone on a line
-			if line.startswith("getKey") or line.startswith("abs") or line.startswith("sqrt") or line.startswith("toString(") or line.startswith('randInt('):
+			if line.startswith("getKey") or line.startswith("abs") or line.startswith("sqrt") or line.startswith("toString(") or line.startswith('randInt(') or line.startswith('rand'):
 				statement = line
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
@@ -364,6 +369,12 @@ class TIBasicParser(object):
 		if "toString(" in statement:
 			# Replace toString() with str() if toString() is not inside of quotes
 			statement = re.sub(r'toString\(([^\)]+)\)', r'str(\1)', statement)
+		if "rand" in statement:
+			# Replace rand with random.random() if rand is not inside of quotes
+			statement = re.sub(r'(?!\B"[^"]*)rand(?!\(|I)+(?![^"]*"\B)', "random.random()", statement)
+			statement = re.sub(r'(?!\B"[^"]*)rand\(([0-9])\)(?![^"]*"\B)', r'[random.random() for _ in range(\1)]', statement)
+			self.UTILS['random']['enabled'] = True
+
 		if 'randInt(' in statement:
 			# Replace randInt with random.randint
 			statement = re.sub('randInt', 'random.randint', statement)
