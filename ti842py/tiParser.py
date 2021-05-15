@@ -99,6 +99,8 @@ class TIBasicParser(object):
 				self.UTILS[os.path.splitext(file)[0]]["imports"] = [line.rstrip() for line in f.readlines() if line.startswith("import ") or line.startswith("from ")]
 				self.UTILS[os.path.splitext(file)[0]]["enabled"] = False
 
+		self.drawLock = False
+
 	def convertLine(self, index, line):
 		statement = ""
 		# TODO: Make rules for :, dont fully understand it yet
@@ -259,13 +261,74 @@ class TIBasicParser(object):
 				options.extend([tiMenu[i].strip(" \""), tiMenu[i + 1].strip(" \"")])
 			statement = menu(title, options)
 			self.UTILS["menu"]["enabled"] = True
+		# Line(
+		elif line.startswith('Line('):
+			statement = closeOpen(line.replace('Line(', 'draw.line('))
+			self.UTILS['draw']['enabled'] = True
+
+		# BackgroundOff
+		elif line == 'BackgroundOff':
+			statement = 'draw.backgroundOff()'
+			self.UTILS['draw']['enabled'] = True
+
+		# Background On
+		elif line.startswith('BackgroundOn '):
+			statement = line.replace('BackgroundOn ', 'draw.backgroundOn(')
+			statement = statement.split('(')[0] + '("' + statement.split('(')[1] + '")'
+			self.UTILS['draw']['enabled'] = True
+
+		# ClrDraw
+		elif line == 'ClrDraw':
+			statement = 'draw.clrDraw()'
+			self.UTILS['draw']['enabled'] = True
+
+		# Circle
+		elif line.startswith('Circle('):
+			statement = closeOpen(line.replace('Circle(', 'draw.circle('))
+			self.UTILS['draw']['enabled'] = True
+
+		# Text
+		elif line.startswith('Text('):
+			statement = closeOpen(line.replace('Text(', 'draw.text('))
+			self.UTILS['draw']['enabled'] = True
+
+		# Pxl-On
+		elif line.startswith('Pxl-On('):
+			statement = closeOpen(line.replace('Pxl-On(', 'draw.pxlOn('))
+			self.UTILS['draw']['enabled'] = True
+
+		# Pxl-Off
+		elif line.startswith('Pxl-Off('):
+			statement = closeOpen(line.replace('Pxl-Off(', 'draw.pxlOff('))
+			self.UTILS['draw']['enabled'] = True
+
+		# pxl-Test
+		elif line.startswith('pxl-Test('):
+			statement = closeOpen(line.replace('pxl-Test(', 'draw.pxlTest('))
+			self.UTILS['draw']['enabled'] = True
+
+		# Pt-On
+		elif line.startswith('Pt-On('):
+			statement = closeOpen(line.replace('Pt-On(', 'draw.ptOn('))
+			self.UTILS['draw']['enabled'] = True
+
+		# Pt-Off
+		elif line.startswith('Pt-Off('):
+			statement = closeOpen(line.replace('Pt-Off(', 'draw.ptOff('))
+			self.UTILS['draw']['enabled'] = True
+
+		# TextColor
+		elif line.startswith('TextColor('):
+			statement = closeOpen(line.replace('TextColor(', 'draw.textColor('))
+			self.UTILS['draw']['enabled'] = True
+
 		else:
 			# Things that can be alone on a line
 			if line.startswith("getKey") or line.startswith("abs") or line.startswith("sqrt") or line.startswith("toString(") or line.startswith('randInt('):
 				statement = line
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
-				logger.warning("Unknown indentifier on line %s", index)
+				logger.warning("Unknown indentifier on line %s", index + 1)
 
 		# Fix things contained within statement
 
@@ -313,6 +376,11 @@ class TIBasicParser(object):
 			statement = ' '.join(split_statement)
 
 			self.UTILS['random']['enabled'] = True
+
+		if self.UTILS['draw']['enabled'] == True and self.drawLock == False:
+			self.drawLock = True
+			statement = ['draw = Draw()', 'draw.openWindow()', statement]
+
 		return statement
 
 	def toPython(self):

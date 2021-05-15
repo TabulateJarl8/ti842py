@@ -3,8 +3,8 @@ import os
 
 install_requires = [
 	"basically-ti-basic>=0.1.4",
-	"keyboard>=0.13.5",
-	"pythondialog>=3.5.1"
+	"pythondialog>=3.5.1",
+	"graphics.py>=5.0.0"
 ]
 
 with open("README.md", "r") as fh:
