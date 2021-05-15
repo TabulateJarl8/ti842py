@@ -7,14 +7,15 @@ import subprocess
 
 try:
 	from .tiParser import TIBasicParser
-except:
+except ImportError:
 	from tiParser import TIBasicParser
+
 
 def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, run=False):
 
-	decode = os.path.splitext(infile)[1].lower() == ".8xp" and decompileFile == True
+	decode = os.path.splitext(infile)[1].lower() == ".8xp" and decompileFile is True
 
-	if decode == True or forceDecompile == True:
+	if decode is True or forceDecompile is True:
 		# Decompile 8Xp file
 		try:
 			temp_name = next(tempfile._get_candidate_names())
@@ -25,7 +26,6 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 				pythonCode = TIBasicParser([line.strip() for line in f.readlines()]).toPython()
 		finally:
 			os.remove(temp_name)
-
 
 	else:
 		# Dont decompile
@@ -38,7 +38,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 
 	# Write to outfile
 	if outfile == "stdout":
-		if run == False:
+		if run is False:
 			print("\n".join(pythonCode))
 		else:
 			with tempfile.NamedTemporaryFile() as f:
@@ -48,14 +48,15 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 				proc = subprocess.Popen([sys.executable, f.name])
 				try:
 					proc.wait()
-				except:
+				except Exception:
 					proc.terminate()
 	else:
 		with open(outfile, 'w') as f:
 			for line in pythonCode:
 				f.write(line + "\n")
-		if run == True:
+		if run is True:
 			os.system(sys.executable + " " + outfile)
+
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -64,12 +65,12 @@ def main():
 		required=False,
 		default='stdout',
 		help="Optional output file to write to. Defaults to standard out."
-		)
+	)
 	parser.add_argument(
 		'-i',
 		required=True,
 		help="Input file."
-		)
+	)
 	parser.add_argument(
 		'-n',
 		'--force-normal',

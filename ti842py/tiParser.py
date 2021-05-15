@@ -6,6 +6,7 @@ import shutil
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARNING)
 
+
 def closeOpen(string):
 	# TODO: Fix overwriting on strings
 	# `Output(3,1,"Masses, heavy to light, in kilograms.Assumes no friction and vi 0"` becomes `output(1, 3, "n kilograms.Assumes no friction and vi 0"")`
@@ -16,26 +17,27 @@ def closeOpen(string):
 	for i, c in enumerate(string):
 		if i + 1 == len(string) and c != closingChar:
 			# Last character and current character does not close
-			if open == True:
+			if open is True:
 				# Append open character to string
 				c += closingChar
 		# elif c == "," and open == True:
 			# Reached a comma with open character
 			# newString += closingChar
-		elif open == True and c == closingChar:
+		elif open is True and c == closingChar:
 			# Closing character reached
 			open = False
 			closingChar = ""
-		elif open == False and c == "\"":
+		elif open is False and c == "\"":
 			# Opening quote
 			open = True
 			closingChar = "\""
-		elif open == False and c == "(":
+		elif open is False and c == "(":
 			# Opening parenthesis
 			open = True
 			closingChar = ")"
 		newString += c
 	return newString
+
 
 def menu(title, args):
 	choices = []
@@ -51,12 +53,14 @@ def menu(title, args):
 
 	return ifstmt
 
+
 def fixEquals(string):
 	# Change = to == if not between quotes
 	return re.sub(r'(?!\B"[^"]*)(?<![<>!])\=(?!\()+(?![^"]*"\B)', " == ", string)
 
-def parenthesis_split(sentence,separator=" ",lparen="(",rparen=")"):
-	nb_brackets=0
+
+def parenthesis_split(sentence, separator=" ", lparen="(", rparen=")"):
+	nb_brackets = 0
 	sentence = sentence.strip(separator) # get rid of leading/trailing seps
 
 	l = [0]
@@ -73,10 +77,10 @@ def parenthesis_split(sentence,separator=" ",lparen="(",rparen=")"):
 
 	l.append(len(sentence))
 	# handle missing closing parentheses
-	if nb_brackets>0:
+	if nb_brackets > 0:
 		raise Exception("Syntax error")
 
-	return([sentence[i:j].strip(separator) for i,j in zip(l,l[1:])])
+	return([sentence[i:j].strip(separator) for i, j in zip(l, l[1:])])
 
 
 class TIBasicParser(object):
@@ -131,7 +135,7 @@ class TIBasicParser(object):
 					statement = fixEquals(statement)
 					statement = statement + ":"
 					self.indentIncrease = True
-				elif re.search(r"If.*[^\"]:", line) != None:
+				elif re.search(r"If.*[^\"]:", line) is not None:
 					# If statement on 1 line
 					statement = ["if " + fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
 				else:
@@ -139,7 +143,7 @@ class TIBasicParser(object):
 					statement = ["if " + fixEquals(line.lstrip("If ")) + ":", '\t' + self.convertLine(index + 1, self.basic[index + 1])]
 			except IndexError:
 				# Last line in file, test for 1 line If statement
-				if re.search(r"If.*[^\"]:", line) != None:
+				if re.search(r"If.*[^\"]:", line) is not None:
 					statement = ["if " + fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
 		elif line == "Then":
 			return None
@@ -252,7 +256,7 @@ class TIBasicParser(object):
 			self.skipLine = 1
 		# Menu
 		elif line.startswith("Menu"):
-			if shutil.which("dialog") == None:
+			if shutil.which("dialog") is None:
 				logger.warning("dialog executable not found. Please install dialog to use menus")
 			tiMenu = line[4:].strip("()").split(",")
 			title = tiMenu.pop(0).strip(" \"")
@@ -377,7 +381,7 @@ class TIBasicParser(object):
 
 			self.UTILS['random']['enabled'] = True
 
-		if self.UTILS['draw']['enabled'] == True and self.drawLock == False:
+		if self.UTILS['draw']['enabled'] is True and self.drawLock is False:
 			self.drawLock = True
 			statement = ['draw = Draw()', 'draw.openWindow()', statement]
 
@@ -399,39 +403,39 @@ class TIBasicParser(object):
 		for index, line in enumerate(self.basic):
 			statement = self.convertLine(index, line)
 
-			if statement == None:
+			if statement is None:
 				continue
 
 			# Indentation
-			if self.indentDecrease == True:
+			if self.indentDecrease is True:
 				self.indentLevel -= 1
 				self.indentDecrease = False
 
 			# Append converted line to list of code
 			if isinstance(statement, str):
-				self.pythonCode.append("\t"*self.indentLevel + statement)
+				self.pythonCode.append("\t" * self.indentLevel + statement)
 			elif isinstance(statement, list):
 				for item in statement:
-					self.pythonCode.append("\t"*self.indentLevel + item)
+					self.pythonCode.append("\t" * self.indentLevel + item)
 
 			# Indentation
-			if self.indentIncrease == True:
+			if self.indentIncrease is True:
 				self.indentLevel += 1
 				self.indentIncrease = False
 
 		# Decorate main with with_goto if goto is used
-		if self.UTILS["goto"]["enabled"] == True:
+		if self.UTILS["goto"]["enabled"] is True:
 			self.pythonCode.insert(0, "@with_goto")
 
 		# Add required utility functions
 		neededImports = []
 		for item in self.UTILS:
-			if self.UTILS[item]["enabled"] == True:
+			if self.UTILS[item]["enabled"] is True:
 				# Add code to new file
 				self.pythonCode = self.UTILS[item]["code"] + self.pythonCode
 				for importedPackage in self.UTILS[item]["imports"]:
 					# Have separate list so that all of the imports are at the top
-					if not importedPackage in neededImports:
+					if importedPackage not in neededImports:
 						neededImports.append(importedPackage)
 		self.pythonCode = neededImports + self.pythonCode
 

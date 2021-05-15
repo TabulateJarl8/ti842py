@@ -1,5 +1,6 @@
 import os
 
+
 def clear():
 	if os.system("clear") != 0:
 		if os.system("cls") != 0:

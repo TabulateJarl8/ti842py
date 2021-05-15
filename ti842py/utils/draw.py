@@ -1,6 +1,7 @@
 from graphics import *
 import time
 
+
 class Draw:
 	def __init__(self):
 		self.win = None
@@ -87,7 +88,7 @@ class Draw:
 		# Row = y; Column = x
 		pnt = Point(column, row)
 		pnt.setOutline(self.tiColorToGraphicsColor(color))
-		if not column in self.pixels:
+		if column not in self.pixels:
 			self.pixels[str(column)] = {}
 		self.pixels[str(column)][str(row)] = pnt
 
@@ -115,9 +116,7 @@ class Draw:
 		if str(y) not in self.points[str(x)]:
 			self.points[str(x)][str(y)] = {}
 
-
 		# If mark is unknown, it will default to 1, so test for 1 with `else`
-
 		if mark in [2, 6]:
 			# 3x3 box
 			p1x = (x - 3 / 2)
