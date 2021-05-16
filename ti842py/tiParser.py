@@ -10,6 +10,7 @@ logging.basicConfig(level=logging.WARNING)
 def closeOpen(string):
 	# TODO: Fix overwriting on strings
 	# `Output(3,1,"Masses, heavy to light, in kilograms.Assumes no friction and vi 0"` becomes `output(1, 3, "n kilograms.Assumes no friction and vi 0"")`
+	# `Output("Hello", 2, 3)` becomes `Output("Hello", 2, 3))`
 	newString = ""
 	# Function for closing open quotation marks/parenthesis
 	open = False
@@ -125,7 +126,7 @@ class TIBasicParser(object):
 		elif "->" in line or "→" in line:
 			statement = re.split("->|→", line)
 			statement.reverse()
-			
+
 			if statement[0] == "rand":
 				# seeding rand
 				statement = "random.seed(" + statement[-1] + ")"
