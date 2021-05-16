@@ -5,7 +5,7 @@ install_requires = [
 	"basically-ti-basic>=0.1.6",
 	"pythondialog>=3.5.1",
 	"graphics.py>=5.0.0",
-	"getkey @ git+https://github.com/li-rupert/getkey@master#egg=getkey"
+	"getkey>=0.6.5"
 ]
 
 with open("README.md", "r") as fh:
