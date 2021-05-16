@@ -125,7 +125,13 @@ class TIBasicParser(object):
 		elif "->" in line or "→" in line:
 			statement = re.split("->|→", line)
 			statement.reverse()
-			statement = " = ".join(statement)
+			
+			if statement[0] == "rand":
+				# seeding rand
+				statement = "random.seed(" + statement[-1] + ")"
+				self.UTILS["random"]["enabled"] = True
+			else:
+				statement = " = ".join(statement)
 		# If
 		elif line.startswith("If "):
 			try:
@@ -371,7 +377,7 @@ class TIBasicParser(object):
 			statement = re.sub(r'toString\(([^\)]+)\)', r'str(\1)', statement)
 		if "rand" in statement:
 			# Replace rand with random.random() if rand is not inside of quotes
-			statement = re.sub(r'(?!\B"[^"]*)rand(?!\(|I)+(?![^"]*"\B)', "random.random()", statement)
+			statement = re.sub(r'(?!\B"[^"]*)rand(?!\(|I|o)+(?![^"]*"\B)', "random.random()", statement)
 			statement = re.sub(r'(?!\B"[^"]*)rand\(([0-9])\)(?![^"]*"\B)', r'[random.random() for _ in range(\1)]', statement)
 			self.UTILS['random']['enabled'] = True
 
