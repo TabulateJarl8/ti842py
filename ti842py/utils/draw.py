@@ -9,7 +9,9 @@ class Draw:
 		self.pixels = {}
 		self.points = {}
 		self.colors = {'BLUE': 'blue', 'RED': 'red', 'BLACK': 'black', 'MAGENTA': 'magenta', 'GREEN': 'green', 'ORANGE': 'orange', 'BROWN': 'brown', 'NAVY': 'navy', 'LTBLUE': 'light sky blue', 'YELLOW': 'yellow', 'WHITE': 'white', 'LTGRAY': 'light gray', 'MEDGRAY': 'dark gray', 'GRAY': 'gray', 'DARKGRAY': 'dark slate gray'}
-		self.colorNumbers = {'10': 'blue', '11': 'red', '12': 'black', '13': 'magenta', '14': 'green', '15': 'orange', '16': 'brown', '17': 'navy', '18': 'light sky blue', '19': 'yellow', '20': 'white', '21': 'light gray', '22': 'dark gray', '23': 'gray', '24': 'dark slate gray'}
+		self.colorNumbers = {'10': 'blue', '11': 'red', '12': 'black', '13': 'magenta', '14': 'green', '15': 'orange', '16': 'brown', '17': 'navy', '18': 'light sky blue', '19': 'yellow', '20': 'white', '0': 'white', '21': 'light gray', '22': 'dark gray', '23': 'gray', '24': 'dark slate gray'}
+		for _ in range(1, 10):
+			self.colorNumbers[str(_)] = 'blue'
 		self.currentTextColor = 'blue'
 
 	def _slow(function):
@@ -45,6 +47,10 @@ class Draw:
 			color = color.replace(color1, color2)
 		for color1, color2 in self.colorNumbers.items():
 			color = color.replace(color1, color2)
+		if color not in self.colors.values():
+			# Failsafe
+			print(f'WARNING: Unknown color: {color}. defaulting to blue.')
+			color = 'blue'
 		return color
 
 	@_slow
