@@ -348,62 +348,73 @@ class TIBasicParser(object):
 
 		# Fix things contained within statement
 
-		if "getKey" in statement:
+		if isinstance(statement, str):
+			statement = [statement]
+
+		if "getKey" in ' '.join(statement):
 			# Replace getKey with getKey() if getKey is not inside of quotes
-			statement = re.sub(r'(?!\B"[^"]*)getKey(?!\()+(?![^"]*"\B)', "getKey()", statement)
+			statement = [re.sub(r'(?!\B"[^"]*)getKey(?!\()+(?![^"]*"\B)', "getKey()", item) for item in statement]
 			self.UTILS["getKey"]["enabled"] = True
-		if "[theta]" in statement:
+		if "[theta]" in ' '.join(statement):
 			# Replace [theta] with theta if [theta] is not inside of quotes
-			statement = re.sub(r'(?!\B"[^"]*)\[theta\](?![^"]*"\B)', "theta", statement)
-		if "^" in statement:
+			statement = [re.sub(r'(?!\B"[^"]*)\[theta\](?![^"]*"\B)', "theta", item) for item in statement]
+		if "^" in ' '.join(statement):
 			# Convert every ^ not in a string to **
-			statement = re.sub(r'(?!\B"[^"]*)\^(?![^"]*"\B)', "**", statement)
-		if "–" in statement:
+			statement = [re.sub(r'(?!\B"[^"]*)\^(?![^"]*"\B)', "**", item) for item in statement]
+		if "–" in ' '.join(statement):
 			# Remove long dash if not in string
-			statement = re.sub(r'(?!\B"[^"]*)–(?![^"]*"\B)', "-", statement)
-		if "getTime" in statement:
+			statement = [re.sub(r'(?!\B"[^"]*)–(?![^"]*"\B)', "-", item) for item in statement]
+		if "getTime" in ' '.join(statement):
 			# Replace getTime with getTime() if getTime is not inside of quotes
-			statement = re.sub(r'(?!\B"[^"]*)getTime(?!\()+(?![^"]*"\B)', "getTime()", statement)
+			statement = [re.sub(r'(?!\B"[^"]*)getTime(?!\()+(?![^"]*"\B)', "getTime()", item) for item in statement]
 			self.UTILS["getDateTime"]["enabled"] = True
-		if "getDate" in statement:
+		if "getDate" in ' '.join(statement):
 			# Replace getDate with getDate() if getDate is not inside of quotes
-			statement = re.sub(r'(?!\B"[^"]*)getDate(?!\()+(?![^"]*"\B)', "getDate()", statement)
+			statement = [re.sub(r'(?!\B"[^"]*)getDate(?!\()+(?![^"]*"\B)', "getDate()", item) for item in statement]
 			self.UTILS["getDateTime"]["enabled"] = True
-		if "sqrt(" in statement:
+		if "sqrt(" in ' '.join(statement):
 			# Replace sqrt with math.sqrt if sqrt is not inside of quotes
-			statement = re.sub(r'(?!\B"[^"]*)sqrt(?![^"]*"\B)', "math.sqrt", statement)
+			statement = [re.sub(r'(?!\B"[^"]*)sqrt(?![^"]*"\B)', "math.sqrt", item) for item in statement]
 			self.UTILS["math"]["enabled"] = True
-		if "toString(" in statement:
+		if "toString(" in ' '.join(statement):
 			# Replace toString() with str() if toString() is not inside of quotes
-			statement = re.sub(r'toString\(([^\)]+)\)', r'str(\1)', statement)
-		if "rand" in statement:
+			statement = [re.sub(r'toString\(([^\)]+)\)', r'str(\1)', item) for item in statement]
+		if "rand" in ' '.join(statement):
 			# Replace rand with random.random() if rand is not inside of quotes
-			statement = re.sub(r'(?!\B"[^"]*)rand(?!\(|I|o)+(?![^"]*"\B)', "random.random()", statement)
-			statement = re.sub(r'(?!\B"[^"]*)rand\(([0-9])\)(?![^"]*"\B)', r'[random.random() for _ in range(\1)]', statement)
+			statement = [re.sub(r'(?!\B"[^"]*)rand(?!\(|I|o)+(?![^"]*"\B)', "random.random()", item) for item in statement]
+			statement = [re.sub(r'(?!\B"[^"]*)rand\(([0-9])\)(?![^"]*"\B)', r'[random.random() for _ in range(\1)]', item) for item in statement]
 			self.UTILS['random']['enabled'] = True
-		if 'dayOfWk(' in statement:
+		if 'dayOfWk(' in ' '.join(statement):
 			self.UTILS['getDateTime']['enabled'] = True
 
-		if 'randInt(' in statement:
+		if re.search(r'l[1-6]\([1-999]\)', ' '.join(statement)):
+			# List subscription
+			statement = [re.sub(r'(l[1-6])\(([1-999])\)', lambda m: m.group(1) + '[' + str(int(m.group(2)) - 1) + ']', item) for item in statement]
+
+		if 'randInt(' in ' '.join(statement):
 			# Replace randInt with random.randint
-			statement = re.sub('randInt', 'random.randint', statement)
+			statement = [re.sub('randInt', 'random.randint', item) for item in statement]
 
-			split_statement = parenthesis_split(closeOpen(statement))
+			for i in range(len(statement)):
+				split_statement = parenthesis_split(closeOpen(statement[i]))
 
-			for i in range(len((split_statement))):
-				if 'random.randint' in split_statement[i]:
-					args = re.search(r'random\.randint\((.*?)\)', split_statement[i]).group(1).replace(' ', '').split(',') # get data in between parentheses
-					if len(args) >= 3:
-						# Generate args[2] amount of random numbers
-						split_statement[i] = re.sub(r'random\.randint\(.*?\)', '[random.randint(' + args[0] + ', ' + args[1] + ') for i in range(' + args[2] + ')]', split_statement[i])
+				for i in range(len((split_statement))):
+					if 'random.randint' in split_statement[i]:
+						args = re.search(r'random\.randint\((.*?)\)', split_statement[i]).group(1).replace(' ', '').split(',') # get data in between parentheses
+						if len(args) >= 3:
+							# Generate args[2] amount of random numbers
+							split_statement[i] = re.sub(r'random\.randint\(.*?\)', '[random.randint(' + args[0] + ', ' + args[1] + ') for i in range(' + args[2] + ')]', split_statement[i])
 
-			statement = ' '.join(split_statement)
+				statement[i] = ' '.join(split_statement)
 
 			self.UTILS['random']['enabled'] = True
 
 		if self.UTILS['draw']['enabled'] is True and self.drawLock is False:
 			self.drawLock = True
-			statement = ['draw = Draw()', 'draw.openWindow()', statement]
+			if isinstance(statement, str):
+				statement = ['draw = Draw()', 'draw.openWindow()', statement]
+			else:
+				statement = ['draw = Draw()', 'draw.openWindow()'] + statement
 
 		return statement
 
