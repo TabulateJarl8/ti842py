@@ -416,6 +416,9 @@ class TIBasicParser(object):
 			else:
 				statement = ['draw = Draw()', 'draw.openWindow()'] + statement
 
+		if isinstance(statement, list) and len(statement) == 1:
+			statement = statement[0]
+
 		return statement
 
 	def toPython(self):
