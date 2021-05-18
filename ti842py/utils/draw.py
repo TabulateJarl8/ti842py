@@ -1,5 +1,6 @@
 from graphics import *
 import time
+import tkinter.font as tkfont
 
 
 class Draw:
@@ -8,6 +9,7 @@ class Draw:
 		self.winOpen = False
 		self.pixels = {}
 		self.points = {}
+		self.texts = {}
 		self.colors = {'BLUE': 'blue', 'RED': 'red', 'BLACK': 'black', 'MAGENTA': 'magenta', 'GREEN': 'green', 'ORANGE': 'orange', 'BROWN': 'brown', 'NAVY': 'navy', 'LTBLUE': 'light sky blue', 'YELLOW': 'yellow', 'WHITE': 'white', 'LTGRAY': 'light gray', 'MEDGRAY': 'dark gray', 'GRAY': 'gray', 'DARKGRAY': 'dark slate gray'}
 		self.colorNumbers = {'10': 'blue', '11': 'red', '12': 'black', '13': 'magenta', '14': 'green', '15': 'orange', '16': 'brown', '17': 'navy', '18': 'light sky blue', '19': 'yellow', '20': 'white', '0': 'white', '21': 'light gray', '22': 'dark gray', '23': 'gray', '24': 'dark slate gray'}
 		for _ in range(1, 10):
@@ -88,11 +90,31 @@ class Draw:
 
 	@_slow
 	def text(self, row, column, *args):
-		# TODO: Set font size and use row/column instead of x and y
-		text = ''.join(args)
+		# column = x, row = y
+		text = ''.join([str(arg) for arg in args])
+		fontsize = 7
+
+		# Calculate correct center value based on text width
+		font = tkfont.Font(family='helvetica', size=fontsize, weight='normal')
+		text_width = font.measure(text) // 2
+		text_height = font.metrics('linespace') // 2
+		column += text_width
+		row += text_height
+
+		# Undraw previous text
+		# TODO: draw background behind it instead, maybe
+		if str(column) in self.texts:
+			if str(row) in self.texts[str(column)]:
+				self.texts[str(column)][str(row)].undraw()
+				del self.texts[str(column)][str(row)]
+
 		message = Text(Point(column, row), text.upper())
 		message.setTextColor(self.currentTextColor)
+		message.setSize(fontsize)
 		message.draw(self.win)
+		if str(row) not in self.texts:
+			self.texts[str(column)] = {}
+		self.texts[str(column)][str(row)] = message
 
 	@_slow
 	def pxlOn(self, row, column, color='blue'):

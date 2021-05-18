@@ -381,6 +381,8 @@ class TIBasicParser(object):
 			statement = re.sub(r'(?!\B"[^"]*)rand(?!\(|I|o)+(?![^"]*"\B)', "random.random()", statement)
 			statement = re.sub(r'(?!\B"[^"]*)rand\(([0-9])\)(?![^"]*"\B)', r'[random.random() for _ in range(\1)]', statement)
 			self.UTILS['random']['enabled'] = True
+		if 'dayOfWk(' in statement:
+			self.UTILS['getDateTime']['enabled'] = True
 
 		if 'randInt(' in statement:
 			# Replace randInt with random.randint
