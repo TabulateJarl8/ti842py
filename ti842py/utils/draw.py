@@ -17,10 +17,10 @@ class Draw:
 		self.currentTextColor = 'blue'
 
 	def _slow(function):
-		def child_function(*args, **kwargs):
+		def wrapper(*args, **kwargs):
 			function(*args, **kwargs)
 			time.sleep(0.01)
-		return child_function
+		return wrapper
 
 	def openWindow(self):
 		# The TI-84 Plus CE has a graph resolution of 250x160 pixels
