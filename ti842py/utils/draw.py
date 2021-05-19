@@ -3,7 +3,21 @@ import time
 import tkinter.font as tkfont
 
 
-# TODO: Define constant color variables
+BLUE = 10
+RED = 11
+BLACK = 12
+MAGENTA = 13
+GREEN = 15
+ORANGE = 15
+BROWN = 16
+NAVY = 17
+LTBLUE = 18
+YELLOW = 19
+WHITE = 20
+LTGRAY = 21
+MEDGRAY = 22
+GRAY = 23
+DARKGRAY = 24
 
 class Draw:
 	def __init__(self):
