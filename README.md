@@ -34,14 +34,13 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
  - `randInt()`/`rand`
  - **Some drawing functions**
  - List subscripting
- 
+
 ### Planned Features
  - `Return`
  - `eval()`/`expr()`
  - `Ans`
 
 ### Known issues
- - Closing strings that have been left open breaks sometimes
  - Calling `Prompt` after `Output` will write to STDOUT over the Output
 
 # Installation

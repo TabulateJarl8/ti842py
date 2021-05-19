@@ -3,6 +3,8 @@ import time
 import tkinter.font as tkfont
 
 
+# TODO: Define constant color variables
+
 class Draw:
 	def __init__(self):
 		self.win = None

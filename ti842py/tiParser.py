@@ -8,36 +8,11 @@ logging.basicConfig(level=logging.WARNING)
 
 
 def closeOpen(string):
-	# TODO: Fix overwriting on strings
-	# `Output(3,1,"Masses, heavy to light, in kilograms.Assumes no friction and vi 0"` becomes `output(1, 3, "n kilograms.Assumes no friction and vi 0"")`
-	# `Output("Hello", 2, 3)` becomes `Output("Hello", 2, 3))`
-	newString = ""
-	# Function for closing open quotation marks/parenthesis
-	open = False
-	closingChar = ""
-	for i, c in enumerate(string):
-		if i + 1 == len(string) and c != closingChar:
-			# Last character and current character does not close
-			if open is True:
-				# Append open character to string
-				c += closingChar
-		# elif c == "," and open == True:
-			# Reached a comma with open character
-			# newString += closingChar
-		elif open is True and c == closingChar:
-			# Closing character reached
-			open = False
-			closingChar = ""
-		elif open is False and c == "\"":
-			# Opening quote
-			open = True
-			closingChar = "\""
-		elif open is False and c == "(":
-			# Opening parenthesis
-			open = True
-			closingChar = ")"
-		newString += c
-	return newString
+	if string.count("\"") % 2 != 0:
+		string = string + "\""
+	toAdd = string.count('(') - string.count(')')
+	string = string + ')' * toAdd
+	return string
 
 
 def menu(title, args):
@@ -338,6 +313,13 @@ class TIBasicParser(object):
 			statement = 'draw.openWindow()'
 			self.UTILS['draw']['enabled'] = True
 
+		elif line == 'ClrAllLists':
+			statement = 'l1 = l2 = l3 = l4 = l5 = l6 = [None for _ in range(0, 999)]'
+
+		# Clr single list
+		elif line.startswith('ClrList '):
+			statement = line[8:] + ' = [None for _ in range(0, 999)]'
+
 		else:
 			# Things that can be alone on a line
 			if line.startswith("getKey") or line.startswith("abs") or line.startswith("sqrt") or line.startswith("toString(") or line.startswith('randInt(') or line.startswith('rand'):
@@ -363,7 +345,7 @@ class TIBasicParser(object):
 			statement = [re.sub(r'(?!\B"[^"]*)\^(?![^"]*"\B)', "**", item) for item in statement]
 		if "–" in ' '.join(statement):
 			# Remove long dash if not in string
-			statement = [re.sub(r'(?!\B"[^"]*)–(?![^"]*"\B)', "-", item) for item in statement]
+			statement = [item.replace('–', "-") for item in statement]
 		if "getTime" in ' '.join(statement):
 			# Replace getTime with getTime() if getTime is not inside of quotes
 			statement = [re.sub(r'(?!\B"[^"]*)getTime(?!\()+(?![^"]*"\B)', "getTime()", item) for item in statement]
@@ -386,10 +368,15 @@ class TIBasicParser(object):
 			self.UTILS['random']['enabled'] = True
 		if 'dayOfWk(' in ' '.join(statement):
 			self.UTILS['getDateTime']['enabled'] = True
+		if 'remainder(' in ' '.join(statement):
+			statement = [re.sub(r'remainder\(([^\)]+)\)', lambda m: m.group(1).replace(' ', '').split(',')[0] + ' % ' + m.group(1).replace(' ', '').split(',')[1], item) for item in statement]
 
-		if re.search(r'l[1-6]\([1-999]\)', ' '.join(statement)):
+		if re.search(r'l[1-6]\([0-9A-Za-z]+\)', ' '.join(statement)):
 			# List subscription
-			statement = [re.sub(r'(l[1-6])\(([1-999])\)', lambda m: m.group(1) + '[' + str(int(m.group(2)) - 1) + ']', item) for item in statement]
+			try:
+				statement = [re.sub(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + str(int(m.group(2)) - 1) + ']', item) for item in statement]
+			except ValueError:
+				statement = [re.sub(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + m.group(2) + ']', item) for item in statement]
 
 		if 'randInt(' in ' '.join(statement):
 			# Replace randInt with random.randint
@@ -398,23 +385,15 @@ class TIBasicParser(object):
 			for i in range(len(statement)):
 				split_statement = parenthesis_split(closeOpen(statement[i]))
 
-				for i in range(len((split_statement))):
-					if 'random.randint' in split_statement[i]:
-						args = re.search(r'random\.randint\((.*?)\)', split_statement[i]).group(1).replace(' ', '').split(',') # get data in between parentheses
+				for j in range(len((split_statement))):
+					if 'random.randint' in split_statement[j]:
+						args = re.search(r'random\.randint\((.*?)\)', split_statement[j]).group(1).replace(' ', '').split(',') # get data in between parentheses
 						if len(args) >= 3:
 							# Generate args[2] amount of random numbers
-							split_statement[i] = re.sub(r'random\.randint\(.*?\)', '[random.randint(' + args[0] + ', ' + args[1] + ') for i in range(' + args[2] + ')]', split_statement[i])
-
+							split_statement[j] = re.sub(r'random\.randint\(.*?\)', '[random.randint(' + args[0] + ', ' + args[1] + ') for i in range(' + args[2] + ')]', split_statement[j])
 				statement[i] = ' '.join(split_statement)
 
 			self.UTILS['random']['enabled'] = True
-
-		if self.UTILS['draw']['enabled'] is True and self.drawLock is False:
-			self.drawLock = True
-			if isinstance(statement, str):
-				statement = ['draw = Draw()', 'draw.openWindow()', statement]
-			else:
-				statement = ['draw = Draw()', 'draw.openWindow()'] + statement
 
 		if isinstance(statement, list) and len(statement) == 1:
 			statement = statement[0]
@@ -436,6 +415,11 @@ class TIBasicParser(object):
 		# Iterate over TI-BASIC code and convert each line
 		for index, line in enumerate(self.basic):
 			statement = self.convertLine(index, line)
+
+			if self.UTILS['draw']['enabled'] is True and self.drawLock is False:
+				self.drawLock = True
+				self.pythonCode.insert(1, '\tdraw.openWindow()')
+				self.pythonCode.insert(1, '\tdraw = Draw()')
 
 			if statement is None:
 				continue
