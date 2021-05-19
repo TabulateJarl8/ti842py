@@ -424,7 +424,7 @@ class TIBasicParser(object):
 	def toPython(self):
 		self.pythonCode = []
 
-		self.pythonCode += ["def main():"]
+		self.pythonCode += ["def main():", "\tl1 = l2 = l3 = l4 = l5 = l6 = [None for _ in range(0, 999)] # init lists"]
 
 		self.indentLevel = 1
 		# indentIncrease increases the indent on the next line
