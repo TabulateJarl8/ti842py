@@ -48,3 +48,8 @@ sqrt(6+3)
 If 3+3=6:Disp "GOOD"
 If 3+5=6
 Disp "no"
+Disp getTime
+Disp "getTime"
+getTime->l1
+Disp l1(1)
+Disp toString(3)

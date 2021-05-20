@@ -35,6 +35,23 @@ def fixEquals(string):
 	return re.sub(r'(?!\B"[^"]*)(?<![<>!])\=(?!\()+(?![^"]*"\B)', " == ", string)
 
 
+def noStringReplace(regexp, newSubstr, statementList):
+	# Replace everything in statementList that matches regexp with newSubstr, as long as its not in a string
+	# Split by "
+	statementList = [item.split('"') for item in statementList]
+
+	# Iterate through expression list
+	for i in range(len(statementList)):
+		# Skip all even elements since those are in between quotes
+		for j in range(0, len(statementList[i]), 2):
+			statementList[i][j] = re.sub(regexp, newSubstr, statementList[i][j])
+
+		# Restore list element
+		statementList[i] = '"'.join(statementList[i])
+
+	return statementList
+
+
 def parenthesis_split(sentence, separator=" ", lparen="(", rparen=")"):
 	nb_brackets = 0
 	sentence = sentence.strip(separator) # get rid of leading/trailing seps
@@ -336,55 +353,55 @@ class TIBasicParser(object):
 
 		if "getKey" in ' '.join(statement):
 			# Replace getKey with getKey() if getKey is not inside of quotes
-			statement = [re.sub(r'(?!\B"[^"]*)getKey(?!\()+(?![^"]*"\B)', "getKey()", item) for item in statement]
+			statement = noStringReplace(r'getKey(?!\()+', "getKey()", statement)
 			self.UTILS["getKey"]["enabled"] = True
 		if "[theta]" in ' '.join(statement):
 			# Replace [theta] with theta if [theta] is not inside of quotes
 			statement = [item.replace('[theta]', "theta") for item in statement]
 		if "^" in ' '.join(statement):
 			# Convert every ^ not in a string to **
-			statement = [re.sub(r'(?!\B"[^"]*)\^(?![^"]*"\B)', "**", item) for item in statement]
+			statement = noStringReplace(r'\^', '**', statement)
 		if "–" in ' '.join(statement):
-			# Remove long dash if not in string
+			# Remove long dash
 			statement = [item.replace('–', "-") for item in statement]
 		if "getTime" in ' '.join(statement):
 			# Replace getTime with getTime() if getTime is not inside of quotes
-			statement = [re.sub(r'(?!\B"[^"]*)getTime(?!\()+(?![^"]*"\B)', "getTime()", item) for item in statement]
+			statement = noStringReplace(r'getTime(?!\()+', 'getTime()', statement)
 			self.UTILS["getDateTime"]["enabled"] = True
 		if "getDate" in ' '.join(statement):
 			# Replace getDate with getDate() if getDate is not inside of quotes
-			statement = [re.sub(r'(?!\B"[^"]*)getDate(?!\()+(?![^"]*"\B)', "getDate()", item) for item in statement]
+			statement = noStringReplace(r'getDate(?!\()+', 'getDate()', statement)
 			self.UTILS["getDateTime"]["enabled"] = True
 		if "sqrt(" in ' '.join(statement):
 			# Replace sqrt with math.sqrt if sqrt is not inside of quotes
-			statement = [re.sub(r'(?!\B"[^"]*)sqrt(?![^"]*"\B)', "math.sqrt", item) for item in statement]
+			statement = noStringReplace('sqrt', 'math.sqrt', statement)
 			self.UTILS["math"]["enabled"] = True
 		if "toString(" in ' '.join(statement):
 			# Replace toString() with str() if toString() is not inside of quotes
-			statement = [re.sub(r'toString\(([^\)]+)\)', r'str(\1)', item) for item in statement]
+			statement = noStringReplace(r'toString\(([^\)]+)\)', r'str(\1)', statement)
 		if "rand" in ' '.join(statement):
 			# Replace rand with random.random() if rand is not inside of quotes
-			statement = [re.sub(r'(?!\B"[^"]*)rand(?!\(|I|o)+(?![^"]*"\B)', "random.random()", item) for item in statement]
-			statement = [re.sub(r'(?!\B"[^"]*)rand\(([0-9])\)(?![^"]*"\B)', r'[random.random() for _ in range(\1)]', item) for item in statement]
+			statement = noStringReplace(r'rand(?!\(|I|o)+', 'random.random()', statement)
+			statement = noStringReplace(r'rand\(([0-9])\)', r'[random.random() for _ in range(\1)]', statement)
 			self.UTILS['random']['enabled'] = True
 		if 'dayOfWk(' in ' '.join(statement):
 			self.UTILS['getDateTime']['enabled'] = True
 		if 'remainder(' in ' '.join(statement):
-			statement = [re.sub(r'remainder\(([^\)]+)\)', lambda m: m.group(1).replace(' ', '').split(',')[0] + ' % ' + m.group(1).replace(' ', '').split(',')[1], item) for item in statement]
+			statement = noStringReplace(r'remainder\(([^\)]+)\)', lambda m: m.group(1).replace(' ', '').split(',')[0] + ' % ' + m.group(1).replace(' ', '').split(',')[1], statement)
 
 		if 'dim(' in ' '.join(statement):
-			statement = [item.replace('dim(', 'len(') for item in statement]
+			statement = noStringReplace(r'dim\(', 'len(', statement)
 
 		if re.search(r'l[1-6]\([0-9A-Za-z]+\)', ' '.join(statement)):
 			# List subscription
 			try:
-				statement = [re.sub(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + str(int(m.group(2)) - 1) + ']', item) for item in statement]
+				statement = noStringReplace(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + str(int(m.group(2)) - 1) + ']', statement)
 			except ValueError:
-				statement = [re.sub(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + m.group(2) + ']', item) for item in statement]
+				statement = noStringReplace(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + m.group(2) + ']', statement)
 
 		if 'randInt(' in ' '.join(statement):
 			# Replace randInt with random.randint
-			statement = [re.sub('randInt', 'random.randint', item) for item in statement]
+			statement = noStringReplace('randInt', 'random.randint', statement)
 
 			for i in range(len(statement)):
 				split_statement = parenthesis_split(closeOpen(statement[i]))
