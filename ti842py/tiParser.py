@@ -330,7 +330,7 @@ class TIBasicParser(object):
 				logger.warning("Unknown indentifier on line %s", index + 1)
 
 		# Fix things contained within statement
-
+		# maybe switch to parsing with `ast` for easier detection of strings/non-strings
 		if isinstance(statement, str):
 			statement = [statement]
 
