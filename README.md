@@ -90,3 +90,17 @@ The last way that ti842py can be ran is by running the main python file. After c
  - `getKey` - The `getKey` function works just like it does in normal TI-BASIC, except with some special rules. Any key on the keyboard pressed will be converted to the corresponding key on the calculator. This works for letters, numbers, arrow keys, enter, delete, and symbols. As for the buttons not on a keyboard, the top 5 keys are the F1-F5 keys on the keyboard, `2nd` is grave `` ` ``, and `alpha` is tilda `~`. `mode` is F6, `stat` is f7, `vars` is F8, `clear` is F9, and the `X,T,θ,n` key is F10.
 
  - `If` - `If` blocks with `Then` after the `If` must be ended with `End`, they cannot be left open. `If` blocks on 2 lines without a `Then` cannot be closed with `End`
+
+# Libraries used
+
+----
+
+ - [My fork of basically-ti-basic](https://github.com/TabulateJarl8/basically-ti-basic) - for decompiling `.8Xp` files
+
+ - [graphics.py](https://anh.cs.luc.edu/handsonPythonTutorial/graphics.html) - for drawing features
+
+ - [insignification's fork of the goto module](https://github.com/insignification/python-goto/tree/fix2) - for `goto`/`lbl` support
+
+ - [getkey](https://github.com/kcsaff/getkey) - for non-blocking input support
+
+ - [pythondialog](http://pythondialog.sourceforge.net/doc/) - Python wrapper around `dialog` for `Menu` support
