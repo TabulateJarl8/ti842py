@@ -234,14 +234,7 @@ class TIBasicParser(object):
 			self.UTILS["goto"]["enabled"] = True
 		# Output
 		elif line.startswith("Output("):
-			statement = line[7:]
-			statement = statement.split(",")
-			if statement[-1].count("\"") > 1:
-				statement[-1] = "\"" + re.findall('"([^"]*)"', statement[-1])[0] + "\""
-			elif statement[-1].count("\"") == 1:
-				statement[-1] = "\"" + statement[-1].strip(" ")[1:] + "\""
-			statement[-1] = statement[-1].strip(" ")
-			statement = "output(" + statement[1].strip(" ") + ", " + statement[0].strip(" ") + ", " + statement[-1] + ")"
+			statement = noStringReplace('Output', 'output', [closeOpen(line)])
 			self.UTILS["output"]["enabled"] = True
 		# DS<(
 		elif line.startswith("DS<("):

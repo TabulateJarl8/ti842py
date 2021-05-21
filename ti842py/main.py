@@ -7,8 +7,10 @@ import subprocess
 
 try:
 	from .tiParser import TIBasicParser
+	from .__version__ import __version__
 except ImportError:
 	from tiParser import TIBasicParser
+	from __version__ import __version__
 
 
 def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, run=False):
@@ -95,6 +97,13 @@ def main():
 		action="store_true",
 		help="Runs the program after it\'s done transpiling. Will not print to stdout",
 		dest='run'
+	)
+
+	parser.add_argument(
+		'-V',
+		'--version',
+		action='version',
+		version='ti842py {version}'.format(version=__version__)
 	)
 
 	args = parser.parse_args()
