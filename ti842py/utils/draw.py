@@ -68,7 +68,7 @@ class Draw:
 		if color not in self.colors.values():
 			# Failsafe
 			print(f'WARNING: Unknown color: {color}. defaulting to blue.')
-			color = 'blue'
+			color = 'white'
 		return color
 
 	@_slow

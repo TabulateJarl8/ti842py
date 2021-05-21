@@ -19,15 +19,10 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 
 	if decode is True or forceDecompile is True:
 		# Decompile 8Xp file
-		try:
-			temp_name = next(tempfile._get_candidate_names())
-			while os.path.exists(temp_name):
-				temp_name = next(tempfile._get_candidate_names())
-			btb.decompile_file(infile, temp_name)
-			with open(temp_name, 'r') as f:
-				pythonCode = TIBasicParser([line.strip() for line in f.readlines()]).toPython()
-		finally:
-			os.remove(temp_name)
+		with tempfile.NamedTemporaryFile() as f:
+			btb.decompile_file(infile, f.name)
+			with open(f.name, 'r') as fp:
+				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()]).toPython()
 
 	else:
 		# Dont decompile
