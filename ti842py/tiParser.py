@@ -10,8 +10,18 @@ logging.basicConfig(level=logging.WARNING)
 def closeOpen(string):
 	if string.count("\"") % 2 != 0:
 		string = string + "\""
-	toAdd = string.count('(') - string.count(')')
-	string = string + ')' * toAdd
+
+	# Split string by "
+	splitString = string.split('"')
+	open = 0
+	closed = 0
+
+	for i in range(0, len(splitString), 2): # skip all even elements since those are in between quotes
+		open += splitString[i].count('(')
+		closed += splitString[i].count(')')
+
+	# Add needed closing parentheses
+	string = string + ')' * (open - closed)
 	return string
 
 
@@ -76,14 +86,28 @@ def parenthesis_split(sentence, separator=" ", lparen="(", rparen=")"):
 	return([sentence[i:j].strip(separator) for i, j in zip(l, l[1:])])
 
 
+def toValidEqn(eqn):
+	# Try to turn things like AB into A*B and A(3) into A*(3)
+	eqn = eqn.split('"')
+	for i in range(0, len(eqn), 2): # Skip all even elements since those are in between quotes
+		while re.search(r'((?:[A-Z0-9]+)|(?:[A-Z]\w*\(\w+\)))((?:[A-Z]\w*)|\()', eqn[i]) or re.search(r'(\))((?:[A-Z]\w*)|\()', eqn[i]):
+			eqn[i] = re.sub(r"((?:[A-Z0-9]+)|(?:[A-Z]\w*\(\w+\)))((?:[A-Z]\w*)|\()", r"\1*\2", eqn[i])
+			eqn[i] = re.sub(r'(\))((?:[A-Z]\w*)|\()', r'\1*\2', eqn[i])
+	eqn = '"'.join(eqn)
+	return eqn
+
+
 class TIBasicParser(object):
-	def __init__(self, basic):
+	def __init__(self, basic, multiplication):
+		# if multiplication is True, the transpiler will attempt to fix implicit multiplication
 		if isinstance(basic, list):
 			self.basic = basic
 		elif isinstance(basic, str):
 			self.basic = [line.strip() for line in basic.split("\n")]
 		else:
 			raise TypeError("basic must be list or str, not {}".format(str(type(basic))))
+
+		self.multiplication = multiplication
 
 		# Utility Functions
 		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}, "math": {"code": [""], "imports": ["import math"], "enabled": False}, 'random': {'code': [''], 'imports': ['import random'], 'enabled': False}}
@@ -99,6 +123,9 @@ class TIBasicParser(object):
 		self.drawLock = False
 
 	def convertLine(self, index, line):
+		if self.multiplication:
+			line = toValidEqn(line)
+
 		statement = ""
 		# TODO: Make rules for :, dont fully understand it yet
 		# if line.startswith("\""):
@@ -140,6 +167,11 @@ class TIBasicParser(object):
 				else:
 					# If statement on 2 lines; no Then
 					statement = ["if " + fixEquals(line.lstrip("If ")) + ":", '\t' + self.convertLine(index + 1, self.basic[index + 1])]
+
+					if self.basic[index + 2].startswith('End'):
+						self.skipLine = 2 # prioritize ending the if statement
+					else:
+						self.skipLine = 1 # skip next line since its incorporated into this line
 			except IndexError:
 				# Last line in file, test for 1 line If statement
 				if re.search(r"If.*[^\"]:", line) is not None:
@@ -231,6 +263,7 @@ class TIBasicParser(object):
 		# Lbl
 		elif line.startswith("Lbl "):
 			statement = "label .lbl" + line[4:]
+			statement = statement.replace(':', '\n') # you can end lbl with :
 			self.UTILS["goto"]["enabled"] = True
 		# Output
 		elif line.startswith("Output("):
@@ -418,6 +451,7 @@ class TIBasicParser(object):
 		self.pythonCode = []
 
 		self.pythonCode += ["def main():", "\tl1 = l2 = l3 = l4 = l5 = l6 = [None for _ in range(0, 999)] # init lists"]
+		self.pythonCode += ["\tA = B = C = D = E = F = G = H = I = J = K = L = M = N = O = P = Q = R = S = T = U = V = W = X = Y = Z = theta = 0 # init variables"]
 
 		self.indentLevel = 1
 		# indentIncrease increases the indent on the next line

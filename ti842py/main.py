@@ -13,7 +13,7 @@ except ImportError:
 	from __version__ import __version__
 
 
-def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, run=False):
+def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, run=False):
 
 	decode = os.path.splitext(infile)[1].lower() == ".8xp" and decompileFile is True
 
@@ -25,7 +25,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 				temp_name = next(tempfile._get_candidate_names())
 			btb.decompile_file(infile, temp_name)
 			with open(temp_name, 'r') as f:
-				pythonCode = TIBasicParser([line.strip() for line in f.readlines()]).toPython()
+				pythonCode = TIBasicParser([line.strip() for line in f.readlines()], multiplication).toPython()
 		finally:
 			os.remove(temp_name)
 
@@ -92,6 +92,13 @@ def main():
 	)
 
 	parser.add_argument(
+		'--no-fix-multiplication',
+		action='store_false',
+		help='Do not attempt to fix implicit multiplication. For example, AB -> A*B and A(1) -> A*(1)',
+		dest='multiplication'
+	)
+
+	parser.add_argument(
 		'-r',
 		'--run',
 		action="store_true",
@@ -107,7 +114,7 @@ def main():
 	)
 
 	args = parser.parse_args()
-	transpile(args.infile[0], args.outfile, args.n, args.d, args.run)
+	transpile(args.infile[0], args.outfile, args.n, args.d, args.multiplication, args.run)
 
 
 if __name__ == "__main__":
