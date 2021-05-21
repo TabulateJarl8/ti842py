@@ -56,12 +56,17 @@ ti842py can be installed via PyPI or by cloning the repository. To install it wi
 ti842py can be used in 3 different ways. The first way is just running it from the command line. For example, if you wanted to convert the program in `tiprogram.txt` to `tiprogram.py`, you can this command: `ti842py -i tiprogram.txt -o tiprogram.py`. If no value is specified for `-o`, the converted program will be written to `stdout`. The `-n` flag can be added to force the transpiler to not decompile the input file, and the `-d` flag can be added to force the transpiler to attempt and decompile the input file. If the `--run` or `-r` argument is supplied, the resulting python file will be run after it is done transpiling
 
 ```
-usage: ti842py [-h] [-o O] -i I [-n] [-d] [-r]
+usage: ti842py [-h] [-o OUTFILE] [-n] [-d] [-r] infile
+
+TI-BASIC to Python 3 Transpiler
+
+positional arguments:
+  infile                Input file.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -o O                  Optional output file to write to. Defaults to standard out.
-  -i I                  Input file.
+  -o OUTFILE, --out OUTFILE
+                        Optional output file to write to. Defaults to standard out.
   -n, --force-normal    Forces the program to not attempt and decompile the input file. Useful for false positives
   -d, --force-decompile
                         Forces the program to attempt to decompile the input file

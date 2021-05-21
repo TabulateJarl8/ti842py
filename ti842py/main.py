@@ -59,17 +59,20 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 
 
 def main():
-	parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser(description='TI-BASIC to Python 3 Transpiler')
 	parser.add_argument(
-		'-o',
-		required=False,
-		default='stdout',
-		help="Optional output file to write to. Defaults to standard out."
+		'infile',
+		metavar='infile',
+		nargs=1,
+		help="Input file."
 	)
 	parser.add_argument(
-		'-i',
-		required=True,
-		help="Input file."
+		'-o',
+		'--out',
+		required=False,
+		default='stdout',
+		dest='outfile',
+		help="Optional output file to write to. Defaults to standard out."
 	)
 	parser.add_argument(
 		'-n',
@@ -95,8 +98,7 @@ def main():
 	)
 
 	args = parser.parse_args()
-
-	transpile(args.i, args.o, args.n, args.d, args.run)
+	transpile(args.infile[0], args.outfile, args.n, args.d, args.run)
 
 
 if __name__ == "__main__":
