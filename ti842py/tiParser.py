@@ -86,28 +86,25 @@ def parenthesis_split(sentence, separator=" ", lparen="(", rparen=")"):
 	return([sentence[i:j].strip(separator) for i, j in zip(l, l[1:])])
 
 
-def toValidEqn(eqn):
-	# Try to turn things like AB into A*B and A(3) into A*(3)
-	eqn = eqn.split('"')
-	for i in range(0, len(eqn), 2): # Skip all even elements since those are in between quotes
-		while re.search(r'((?:[A-Z0-9]+)|(?:[A-Z]\w*\(\w+\)))((?:[A-Z]\w*)|\()', eqn[i]) or re.search(r'(\))((?:[A-Z]\w*)|\()', eqn[i]):
-			eqn[i] = re.sub(r"((?:[A-Z0-9]+)|(?:[A-Z]\w*\(\w+\)))((?:[A-Z]\w*)|\()", r"\1*\2", eqn[i])
-			eqn[i] = re.sub(r'(\))((?:[A-Z]\w*)|\()', r'\1*\2', eqn[i])
-	eqn = '"'.join(eqn)
-	return eqn
+# def toValidEqn(eqn):
+# 	# Try to turn things like AB into A*B and A(3) into A*(3)
+# 	eqn = eqn.split('"')
+# 	for i in range(0, len(eqn), 2): # Skip all even elements since those are in between quotes
+# 		while re.search(r'((?:[A-Z0-9]+)|(?:[A-Z]\w*\(\w+\)))((?:[A-Z]\w*)|\()', eqn[i]) or re.search(r'(\))((?:[A-Z]\w*)|\()', eqn[i]):
+# 			eqn[i] = re.sub(r"((?:[A-Z0-9]+)|(?:[A-Z]\w*\(\w+\)))((?:[A-Z]\w*)|\()", r"\1*\2", eqn[i])
+# 			eqn[i] = re.sub(r'(\))((?:[A-Z]\w*)|\()', r'\1*\2', eqn[i])
+# 	eqn = '"'.join(eqn)
+# 	return eqn
 
 
 class TIBasicParser(object):
-	def __init__(self, basic, multiplication):
-		# if multiplication is True, the transpiler will attempt to fix implicit multiplication
+	def __init__(self, basic):
 		if isinstance(basic, list):
 			self.basic = basic
 		elif isinstance(basic, str):
 			self.basic = [line.strip() for line in basic.split("\n")]
 		else:
 			raise TypeError("basic must be list or str, not {}".format(str(type(basic))))
-
-		self.multiplication = multiplication
 
 		# Utility Functions
 		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}, "math": {"code": [""], "imports": ["import math"], "enabled": False}, 'random': {'code': [''], 'imports': ['import random'], 'enabled': False}}
@@ -123,8 +120,8 @@ class TIBasicParser(object):
 		self.drawLock = False
 
 	def convertLine(self, index, line):
-		if self.multiplication:
-			line = toValidEqn(line)
+		# if self.multiplication:
+		# 	line = toValidEqn(line)
 
 		statement = ""
 		# TODO: Make rules for :, dont fully understand it yet

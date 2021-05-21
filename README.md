@@ -70,8 +70,6 @@ optional arguments:
   -n, --force-normal    Forces the program to not attempt and decompile the input file. Useful for false positives
   -d, --force-decompile
                         Forces the program to attempt to decompile the input file
-  --no-fix-multiplication
-                        Do not attempt to fix implicit multiplication. For example, AB -> A*B and A(1) -> A*(1)
   -r, --run             Runs the program after it's done transpiling. Will not print to stdout
 ```
 
@@ -82,7 +80,7 @@ from ti842py import transpile
 
 transpile("tiprogram.txt", "tiprogram.py")
 ```
-Again, if the second argument is not supplied, the program will be written to `stdout`. The `transpile` command can be supplied with 4 optional arguments, `decompileFile`, `forceDecompile`, `multiplication`, and `run`. `decompileFile` defaults to `True`, and `forceDecompile`, `multiplication`, and `run` default to `False`
+Again, if the second argument is not supplied, the program will be written to `stdout`. The `transpile` command can be supplied with 3 optional arguments, `decompileFile`, `forceDecompile`, and `run`. `decompileFile` defaults to `True`, and `forceDecompile` and `run` default to `False`
 
 The last way that ti842py can be ran is by running the main python file. After cloning the repository, cd into the repository and run `python ti842py/main.py inputfile.txt`. You can supply any arguments that you would supply with the `ti842py` command.
 
