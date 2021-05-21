@@ -36,7 +36,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with open(infile, 'r') as f:
 			file_lines = [line.strip() for line in f.readlines()]
 
-		pythonCode = TIBasicParser(file_lines).toPython()
+		pythonCode = TIBasicParser(file_lines, multiplication).toPython()
 
 	# Write to outfile
 	if outfile == "stdout":
