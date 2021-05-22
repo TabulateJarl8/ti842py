@@ -59,7 +59,7 @@ class Draw:
 		vertical = (y - maxY) / ys
 		return horiz, vertical
 
-	def tiColorToGraphicsColor(self, color):
+	def tiColorToGraphicsColor(self, color, isBackground=False):
 		color = str(color)
 		for color1, color2 in self.colors.items():
 			color = color.replace(color1, color2)
@@ -67,13 +67,17 @@ class Draw:
 			color = color.replace(color1, color2)
 		if color not in self.colors.values():
 			# Failsafe
-			print(f'WARNING: Unknown color: {color}. defaulting to blue.')
-			color = 'white'
+			if not isBackground:
+				print(f'WARNING: Unknown color: {color}. defaulting to blue.')
+				color = 'blue'
+			else:
+				print(f'WARNING: Unknown color: {color}. defaulting to white.')
+				color = 'white'
 		return color
 
 	@_slow
 	def backgroundOn(self, color):
-		self.win.setBackground(self.tiColorToGraphicsColor(color))
+		self.win.setBackground(self.tiColorToGraphicsColor(color, isBackground=True))
 
 	@_slow
 	def backgroundOff(self):
