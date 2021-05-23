@@ -376,7 +376,7 @@ class TIBasicParser(object):
 			self.UTILS["getKey"]["enabled"] = True
 		if "[theta]" in ' '.join(statement):
 			# Replace [theta] with theta if [theta] is not inside of quotes
-			statement = [item.replace('[theta]', "theta") for item in statement]
+			statement = [item.replace('[theta]', "θ") for item in statement]
 		if "^" in ' '.join(statement):
 			# Convert every ^ not in a string to **
 			statement = noStringReplace(r'\^', '**', statement)
@@ -444,7 +444,7 @@ class TIBasicParser(object):
 		self.pythonCode = []
 
 		self.pythonCode += ["def main():", "\tl1 = l2 = l3 = l4 = l5 = l6 = [None for _ in range(0, 999)] # init lists"]
-		self.pythonCode += ["\tA = B = C = D = E = F = G = H = I = J = K = L = M = N = O = P = Q = R = S = T = U = V = W = X = Y = Z = theta = 0 # init variables"]
+		self.pythonCode += ["\tA = B = C = D = E = F = G = H = I = J = K = L = M = N = O = P = Q = R = S = T = U = V = W = X = Y = Z = θ = 0 # init variables"]
 
 		self.indentLevel = 1
 		# indentIncrease increases the indent on the next line
