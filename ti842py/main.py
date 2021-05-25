@@ -13,7 +13,7 @@ except ImportError:
 	from __version__ import __version__
 
 
-def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, run=False):
+def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, run=False):
 
 	decode = os.path.splitext(infile)[1].lower() == ".8xp" and decompileFile is True
 
@@ -22,7 +22,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with tempfile.NamedTemporaryFile() as f:
 			btb.decompile_file(infile, f.name)
 			with open(f.name, 'r') as fp:
-				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()]).toPython()
+				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()], multiplication).toPython()
 
 	else:
 		# Dont decompile
@@ -31,7 +31,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with open(infile, 'r') as f:
 			file_lines = [line.strip() for line in f.readlines()]
 
-		pythonCode = TIBasicParser(file_lines).toPython()
+		pythonCode = TIBasicParser(file_lines, multiplication).toPython()
 
 	# Write to outfile
 	if outfile == "stdout":
@@ -87,6 +87,13 @@ def main():
 	)
 
 	parser.add_argument(
+		'--no-fix-multiplication',
+		action='store_false',
+		help='Do not attempt to fix implicit multiplication. For example, AB -> A*B and A(1) -> A*(1)',
+		dest='multiplication'
+	)
+
+	parser.add_argument(
 		'-r',
 		'--run',
 		action="store_true",
@@ -102,7 +109,7 @@ def main():
 	)
 
 	args = parser.parse_args()
-	transpile(args.infile[0], args.outfile, args.n, args.d, args.run)
+	transpile(args.infile[0], args.outfile, args.n, args.d, args.multiplication, args.run)
 
 
 if __name__ == "__main__":
