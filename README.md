@@ -15,7 +15,7 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
 ----
 
  - Converts string literals to comments
- - Attemps to interpret implicit multiplication
+ - Attempts to interpret implicit multiplication
  - `Disp`/`Output()`
  - Variable assignment
  - `If/Then/Else` statements, including `Else If`
