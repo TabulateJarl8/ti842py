@@ -40,6 +40,11 @@ class TIBasicParser(object):
 		# TODO: possible curses interface instead of just printing and outputting
 
 		statement = ""
+
+		# Fix lists
+		number_table = {'₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6'}
+		line = re.sub('(?:L|l)([₁₂₃₄₅₆]){1}', lambda m: 'L' + number_table[m.group(1)], line)
+
 		# TODO: Make rules for :, dont fully understand it yet
 		if self.skipLine > 0:
 			self.skipLine -= 1

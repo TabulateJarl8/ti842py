@@ -13,9 +13,23 @@ except ImportError:
 	from __version__ import __version__
 
 
+def isUTF8(file):
+	with open(file, 'rb') as f:
+		data = f.read()
+	try:
+		decoded = data.decode('UTF-8')
+	except UnicodeDecodeError:
+		return False
+	else:
+		for ch in decoded:
+			if 0xD800 <= ord(ch) <= 0xDFFF:
+				return False
+		return True
+
+
 def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, run=False):
 
-	decode = os.path.splitext(infile)[1].lower() == ".8xp" and decompileFile is True
+	decode = not isUTF8(infile) and decompileFile is True
 
 	if decode is True or forceDecompile is True:
 		# Decompile 8Xp file
