@@ -4,9 +4,9 @@ import os
 import shutil
 
 try:
-	from . import utils
+	from . import formatting
 except ImportError:
-	import utils
+	import formatting
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARNING)
@@ -50,7 +50,7 @@ class TIBasicParser(object):
 		# Disp
 		elif line.startswith("Disp "):
 			statement = re.search("Disp (.*[^)])", line).groups(1)[0]
-			statement = "print(" + utils.closeOpen(statement) + ", sep=\"\")"
+			statement = "print(" + formatting.closeOpen(statement) + ", sep=\"\")"
 		# Variables
 		elif "->" in line or "→" in line:
 			statement = re.split("->|→", line)
@@ -68,15 +68,15 @@ class TIBasicParser(object):
 				if self.basic[index + 1] == "Then":
 					# If/Then statement
 					statement = "if " + line.lstrip("If ")
-					statement = utils.fixEquals(statement)
+					statement = formatting.fixEquals(statement)
 					statement = statement + ":"
 					self.indentIncrease = True
 				elif re.search(r"If.*[^\"]:", line) is not None:
 					# If statement on 1 line
-					statement = ["if " + utils.fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
+					statement = ["if " + formatting.fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
 				else:
 					# If statement on 2 lines; no Then
-					statement = ["if " + utils.fixEquals(line.lstrip("If ")) + ":", '\t' + self.convertLine(index + 1, self.basic[index + 1])]
+					statement = ["if " + formatting.fixEquals(line.lstrip("If ")) + ":", '\t' + self.convertLine(index + 1, self.basic[index + 1])]
 
 					if self.basic[index + 2].startswith('End'):
 						self.skipLine = 2 # prioritize ending the if statement
@@ -85,13 +85,13 @@ class TIBasicParser(object):
 			except IndexError:
 				# Last line in file, test for 1 line If statement
 				if re.search(r"If.*[^\"]:", line) is not None:
-					statement = ["if " + utils.fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
+					statement = ["if " + formatting.fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
 		elif line == "Then":
 			return None
 		# Elif
 		elif line == "Else" and self.basic[index + 1].startswith("If"):
 			statement = "elif " + self.basic[index + 1].lstrip("If ")
-			statement = utils.fixEquals(statement)
+			statement = formatting.fixEquals(statement)
 			statement = statement + ":"
 			self.indentDecrease = True
 			self.indentIncrease = True
@@ -111,9 +111,9 @@ class TIBasicParser(object):
 			statement = line.split(",")
 			if len(statement) > 1:
 				if "," in statement[1]:
-					statement = statement[1] + " = [toNumber(number) for number in input(" + utils.closeOpen(statement[0][6:]) + ")]"
+					statement = statement[1] + " = [toNumber(number) for number in input(" + formatting.closeOpen(statement[0][6:]) + ")]"
 				else:
-					statement = statement[1] + " = toNumber(input(" + utils.closeOpen(statement[0][6:]) + "))"
+					statement = statement[1] + " = toNumber(input(" + formatting.closeOpen(statement[0][6:]) + "))"
 			else:
 				if statement[0].strip() != "Input":
 					# No input text
@@ -131,11 +131,11 @@ class TIBasicParser(object):
 			self.indentIncrease = True
 		# While loop
 		elif line.startswith("While "):
-			statement = "while " + utils.fixEquals(line[6:]) + ":"
+			statement = "while " + formatting.fixEquals(line[6:]) + ":"
 			self.indentIncrease = True
 		# Repeat loop (tests at bottom)
 		elif line.startswith("Repeat "):
-			statement = ["firstPass = True", "while firstPass == True or not (" + utils.fixEquals(line[7:]) + "):", "\tfirstPass = False"]
+			statement = ["firstPass = True", "while firstPass == True or not (" + formatting.fixEquals(line[7:]) + "):", "\tfirstPass = False"]
 			self.indentIncrease = True
 		# Pause
 		elif line.startswith("Pause"):
@@ -177,7 +177,7 @@ class TIBasicParser(object):
 			self.UTILS["goto"]["enabled"] = True
 		# Output
 		elif line.startswith("Output("):
-			statement = utils.noStringReplace('Output', 'output', [utils.closeOpen(line)])
+			statement = formatting.noStringReplace('Output', 'output', [formatting.closeOpen(line)])
 			self.UTILS["output"]["enabled"] = True
 		# DS<(
 		elif line.startswith("DS<("):
@@ -198,12 +198,12 @@ class TIBasicParser(object):
 			options = []
 			for i in range(0, len(tiMenu), 2):
 				options.extend([tiMenu[i].strip(" \""), tiMenu[i + 1].strip(" \"")])
-			statement = utils.menu(title, options)
+			statement = formatting.menu(title, options)
 			self.UTILS["menu"]["enabled"] = True
 			self.UTILS['clear']['enabled'] = True
 		# Line(
 		elif line.startswith('Line('):
-			statement = utils.closeOpen(line.replace('Line(', 'draw.line('))
+			statement = formatting.closeOpen(line.replace('Line(', 'draw.line('))
 			self.UTILS['draw']['enabled'] = True
 
 		# BackgroundOff
@@ -224,42 +224,42 @@ class TIBasicParser(object):
 
 		# Circle
 		elif line.startswith('Circle('):
-			statement = utils.closeOpen(line.replace('Circle(', 'draw.circle('))
+			statement = formatting.closeOpen(line.replace('Circle(', 'draw.circle('))
 			self.UTILS['draw']['enabled'] = True
 
 		# Text
 		elif line.startswith('Text('):
-			statement = utils.closeOpen(line.replace('Text(', 'draw.text('))
+			statement = formatting.closeOpen(line.replace('Text(', 'draw.text('))
 			self.UTILS['draw']['enabled'] = True
 
 		# Pxl-On
 		elif line.startswith('Pxl-On('):
-			statement = utils.closeOpen(line.replace('Pxl-On(', 'draw.pxlOn('))
+			statement = formatting.closeOpen(line.replace('Pxl-On(', 'draw.pxlOn('))
 			self.UTILS['draw']['enabled'] = True
 
 		# Pxl-Off
 		elif line.startswith('Pxl-Off('):
-			statement = utils.closeOpen(line.replace('Pxl-Off(', 'draw.pxlOff('))
+			statement = formatting.closeOpen(line.replace('Pxl-Off(', 'draw.pxlOff('))
 			self.UTILS['draw']['enabled'] = True
 
 		# pxl-Test
 		elif line.startswith('pxl-Test('):
-			statement = utils.closeOpen(line.replace('pxl-Test(', 'draw.pxlTest('))
+			statement = formatting.closeOpen(line.replace('pxl-Test(', 'draw.pxlTest('))
 			self.UTILS['draw']['enabled'] = True
 
 		# Pt-On
 		elif line.startswith('Pt-On('):
-			statement = utils.closeOpen(line.replace('Pt-On(', 'draw.ptOn('))
+			statement = formatting.closeOpen(line.replace('Pt-On(', 'draw.ptOn('))
 			self.UTILS['draw']['enabled'] = True
 
 		# Pt-Off
 		elif line.startswith('Pt-Off('):
-			statement = utils.closeOpen(line.replace('Pt-Off(', 'draw.ptOff('))
+			statement = formatting.closeOpen(line.replace('Pt-Off(', 'draw.ptOff('))
 			self.UTILS['draw']['enabled'] = True
 
 		# TextColor
 		elif line.startswith('TextColor('):
-			statement = utils.closeOpen(line.replace('TextColor(', 'draw.textColor('))
+			statement = formatting.closeOpen(line.replace('TextColor(', 'draw.textColor('))
 			self.UTILS['draw']['enabled'] = True
 
 		# DispGraph
@@ -287,58 +287,58 @@ class TIBasicParser(object):
 
 		if "getKey" in ' '.join(statement):
 			# Replace getKey with getKey() if getKey is not inside of quotes
-			statement = utils.noStringReplace(r'getKey(?!\()+', "getKey()", statement)
+			statement = formatting.noStringReplace(r'getKey(?!\()+', "getKey()", statement)
 			self.UTILS["getKey"]["enabled"] = True
 		if "[theta]" in ' '.join(statement):
 			# Replace [theta] with theta if [theta] is not inside of quotes
 			statement = [item.replace('[theta]', "θ") for item in statement]
 		if "^" in ' '.join(statement):
 			# Convert every ^ not in a string to **
-			statement = utils.noStringReplace(r'\^', '**', statement)
+			statement = formatting.noStringReplace(r'\^', '**', statement)
 		if "–" in ' '.join(statement):
 			# Remove long dash
 			statement = [item.replace('–', "-") for item in statement]
 		if "getTime" in ' '.join(statement):
 			# Replace getTime with getTime() if getTime is not inside of quotes
-			statement = utils.noStringReplace(r'getTime(?!\()+', 'getTime()', statement)
+			statement = formatting.noStringReplace(r'getTime(?!\()+', 'getTime()', statement)
 			self.UTILS["getDateTime"]["enabled"] = True
 		if "getDate" in ' '.join(statement):
 			# Replace getDate with getDate() if getDate is not inside of quotes
-			statement = utils.noStringReplace(r'getDate(?!\()+', 'getDate()', statement)
+			statement = formatting.noStringReplace(r'getDate(?!\()+', 'getDate()', statement)
 			self.UTILS["getDateTime"]["enabled"] = True
 		if "sqrt(" in ' '.join(statement):
 			# Replace sqrt with math.sqrt if sqrt is not inside of quotes
-			statement = utils.noStringReplace('sqrt', 'math.sqrt', statement)
+			statement = formatting.noStringReplace('sqrt', 'math.sqrt', statement)
 			self.UTILS["math"]["enabled"] = True
 		if "toString(" in ' '.join(statement):
 			# Replace toString() with str() if toString() is not inside of quotes
-			statement = utils.noStringReplace(r'toString\(([^\)]+)\)', r'str(\1)', statement)
+			statement = formatting.noStringReplace(r'toString\(([^\)]+)\)', r'str(\1)', statement)
 		if "rand" in ' '.join(statement):
 			# Replace rand with random.random() if rand is not inside of quotes
-			statement = utils.noStringReplace(r'rand(?!\(|I|o)+', 'random.random()', statement)
-			statement = utils.noStringReplace(r'rand\(([0-9])\)', r'[random.random() for _ in range(\1)]', statement)
+			statement = formatting.noStringReplace(r'rand(?!\(|I|o)+', 'random.random()', statement)
+			statement = formatting.noStringReplace(r'rand\(([0-9])\)', r'[random.random() for _ in range(\1)]', statement)
 			self.UTILS['random']['enabled'] = True
 		if 'dayOfWk(' in ' '.join(statement):
 			self.UTILS['getDateTime']['enabled'] = True
 		if 'remainder(' in ' '.join(statement):
-			statement = utils.noStringReplace(r'remainder\(([^\)]+)\)', lambda m: m.group(1).replace(' ', '').split(',')[0] + ' % ' + m.group(1).replace(' ', '').split(',')[1], statement)
+			statement = formatting.noStringReplace(r'remainder\(([^\)]+)\)', lambda m: m.group(1).replace(' ', '').split(',')[0] + ' % ' + m.group(1).replace(' ', '').split(',')[1], statement)
 
 		if 'dim(' in ' '.join(statement):
-			statement = utils.noStringReplace(r'dim\(', 'len(', statement)
+			statement = formatting.noStringReplace(r'dim\(', 'len(', statement)
 
 		if re.search(r'l[1-6]\([0-9A-Za-z]+\)', ' '.join(statement)):
 			# List subscription
 			try:
-				statement = utils.noStringReplace(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + str(int(m.group(2)) - 1) + ']', statement)
+				statement = formatting.noStringReplace(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + str(int(m.group(2)) - 1) + ']', statement)
 			except ValueError:
-				statement = utils.noStringReplace(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + m.group(2) + ']', statement)
+				statement = formatting.noStringReplace(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + m.group(2) + ']', statement)
 
 		if 'randInt(' in ' '.join(statement):
 			# Replace randInt with random.randint
-			statement = utils.noStringReplace('randInt', 'random.randint', statement)
+			statement = formatting.noStringReplace('randInt', 'random.randint', statement)
 
 			for i in range(len(statement)):
-				split_statement = utils.parenthesis_split(utils.closeOpen(statement[i]))
+				split_statement = formatting.parenthesis_split(formatting.closeOpen(statement[i]))
 
 				for j in range(len((split_statement))):
 					if 'random.randint' in split_statement[j]:
@@ -352,7 +352,7 @@ class TIBasicParser(object):
 
 		if self.multiplication:
 			for index, item in enumerate(statement):
-				statement[index] = utils.toValidEqn(item)
+				statement[index] = formatting.toValidEqn(item)
 
 		if isinstance(statement, list) and len(statement) == 1:
 			statement = statement[0]

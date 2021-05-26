@@ -2,8 +2,6 @@ import token_utils
 import re
 import itertools
 
-import tokenize
-from io import StringIO
 
 def closeOpen(string):
 	if string.count("\"") % 2 != 0:
