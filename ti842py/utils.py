@@ -88,42 +88,20 @@ def toValidEqn(source):
 	"""This adds a multiplication symbol where it would be understood as
 	being implicit by the normal way algebraic equations are written but would
 	be a SyntaxError in Python. Thus we have::
-		2n  -> 2*n
-		n 2 -> n* 2
-		2(a+b) -> 2*(a+b)
-		(a+b)2 -> (a+b)*2
+		2N  -> 2*N
+		N 2 -> N* 2
+		2(A+B) -> 2*(A+B)
+		(A+B)2 -> (A+B)*2
 		2 3 -> 2* 3
-		m n -> m* n
-		(a+b)c -> (a+b)*c
-	The obvious one (in algebra) being left out is something like ``n(...)``
-	which is a function call - and thus valid Python syntax.
+		M N -> M* N
+		(A+B)C -> (A+B)*C
+		A(3) -> A*(3)
+		a(3) -> a(3) - will only add multiplication if the preceding token is capital, since that is a variable
 	"""
 
 	"""
-	MIT License
-
-	Copyright (c) 2020 André Roberge
-
-	[untokenize function modified from https://github.com/myint/untokenize
-	Copyright (C) 2013-2018 Steven Myint - MIT Licence]
-
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files (the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions:
-
-	The above copyright notice and this permission notice shall be included in all
-	copies or substantial portions of the Software.
-
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	SOFTWARE.
+	Modified from ideas
+	https://github.com/aroberge/ideas/blob/master/ideas/examples/implicit_multiplication.py
 	"""
 
 	constants = ['BLUE', 'RED', 'BLACK', 'MAGENTA', 'GREEN', 'ORANGE', 'BROWN', 'NAVY', 'LTBLUE', 'YELLOW', 'WHITE', 'LTGRAY', 'MEDGRAY', 'GRAY', 'DARKGRAY']
@@ -137,11 +115,10 @@ def toValidEqn(source):
 
 	for token in tokens[1:]:
 		if token.is_not_in(constants):
-			# The code has been written in a way to demonstrate that this type of
-			# transformation could be done as the source is tokenized by Python.
+			# Check if implicit multiplication should be added
 			if (
 				(
-					prev_token.is_number()
+					(prev_token.is_number() or (prev_token.is_identifier() and prev_token.string.isupper()))
 					and ((token.is_identifier() and token.string.isupper()) or token.is_number() or token == "(")
 				)
 				or (
@@ -153,6 +130,8 @@ def toValidEqn(source):
 				new_tokens.append("*")
 
 			if token.is_identifier() and token.string.isupper() and len(token.string) > 1:
+				# Multiple variables next to one another
+				# ABC -> A*B*C
 				token.string = '*'.join(token.string)
 				new_tokens.append(token)
 			else:
