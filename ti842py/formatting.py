@@ -9,15 +9,15 @@ def closeOpen(string):
 
 	# Split string by "
 	splitString = string.split('"')
-	open = 0
-	closed = 0
+	open_paren = 0
+	closed_paren = 0
 
 	for i in range(0, len(splitString), 2): # skip all even elements since those are in between quotes
-		open += splitString[i].count('(')
-		closed += splitString[i].count(')')
+		open_paren += splitString[i].count('(')
+		closed_paren += splitString[i].count(')')
 
 	# Add needed closing parentheses
-	string = string + ')' * (open - closed)
+	string = string + ')' * (open_paren - closed_paren)
 	return string
 
 

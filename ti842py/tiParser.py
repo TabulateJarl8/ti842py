@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARNING)
 
 
-class TIBasicParser(object):
+class TIBasicParser:
 	def __init__(self, basic, multiplication):
 		if isinstance(basic, list):
 			self.basic = basic
@@ -356,8 +356,8 @@ class TIBasicParser(object):
 			self.UTILS['random']['enabled'] = True
 
 		if self.multiplication:
-			for index, item in enumerate(statement):
-				statement[index] = formatting.toValidEqn(item)
+			for statement_index, item in enumerate(statement):
+				statement[statement_index] = formatting.toValidEqn(item)
 
 		if isinstance(statement, list) and len(statement) == 1:
 			statement = statement[0]
