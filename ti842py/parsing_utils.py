@@ -1,8 +1,12 @@
-import token_utils
 import re
 import itertools
 import tokenize
 import io
+
+try:
+	from . import token_utils
+except ImportError:
+	import token_utils
 
 
 def closeOpen(string):
