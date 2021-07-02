@@ -1,6 +1,7 @@
 from graphics import *
 import time
 import tkinter.font as tkfont
+import decimal
 
 
 BLUE = 10
@@ -53,10 +54,10 @@ class Draw:
 
 	def graphCoordsToPixels(self, x, y, minX=-10, maxX=10, minY=-10, maxY=10):
 		# Can work for vertical or horizontal coords
-		xs = (maxX - minX) / 250
-		ys = (minY - maxY) / 160
-		horiz = (x - minX) / xs
-		vertical = (y - maxY) / ys
+		xs = (decimal.Decimal(maxX) - decimal.Decimal(minX)) / 250
+		ys = (decimal.Decimal(minY) - decimal.Decimal(maxY)) / 160
+		horiz = (decimal.Decimal(x) - decimal.Decimal(minX)) / decimal.Decimal(xs)
+		vertical = (decimal.Decimal(y) - decimal.Decimal(maxY)) / decimal.Decimal(ys)
 		return horiz, vertical
 
 	def tiColorToGraphicsColor(self, color, isBackground=False):

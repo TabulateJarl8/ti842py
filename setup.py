@@ -5,8 +5,7 @@ install_requires = [
 	"basically-ti-basic>=0.1.6",
 	"pythondialog>=3.5.1",
 	"graphics.py>=5.0.0",
-	"getkey>=0.6.5",
-	"token_utils>=0.1.8"
+	"getkey>=0.6.5"
 ]
 
 with open("README.md", "r") as fh:

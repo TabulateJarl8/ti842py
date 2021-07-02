@@ -1,6 +1,8 @@
 import token_utils
 import re
 import itertools
+import tokenize
+import io
 
 
 def closeOpen(string):
@@ -141,3 +143,37 @@ def toValidEqn(source):
 		prev_token = token
 
 	return token_utils.untokenize(new_tokens)
+
+
+def decistmt(s):
+	# Function for parsing a line of code and making all floats into decimal objects
+
+	# List containing all tokens of new statement
+	result = []
+
+	# Tokenize statement
+	tokens = tokenize.tokenize(io.BytesIO(s.encode('utf-8')).readline)
+
+	# Iterate over tokens
+	for toknum, tokval, _, _, _ in tokens:
+
+		# Test if current token is a number and contains a '.' in order to detect floats
+		if toknum == tokenize.NUMBER and '.' in tokval: # is float
+
+			# Current token is float, so insert a new decimal object into the new statement instead of the current token
+			# Example: 3.3 -> decimal.Decimal("3.3")
+			result.extend([
+				(tokenize.NAME, 'decimal'),
+				(tokenize.OP, '.'),
+				(tokenize.NAME, 'Decimal'),
+				(tokenize.OP, '('),
+				(tokenize.STRING, repr(tokval)),
+				(tokenize.OP, ')')
+			])
+		else:
+			# Current token is not a float, append it to the new statement without modification
+			result.append((toknum, tokval))
+
+	# Convert token list back into source code
+	return tokenize.untokenize(result).decode('utf-8')
+

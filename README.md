@@ -16,6 +16,7 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
 
  - Converts string literals to comments
  - Attempts to interpret implicit multiplication
+ - Attempts to fix floating point arithmetic errors
  - `Disp`/`Output()`
  - Variable assignment
  - `If/Then/Else` statements, including `Else If`
@@ -73,6 +74,8 @@ optional arguments:
                         Forces the program to attempt to decompile the input file
   --no-fix-multiplication
                         Do not attempt to fix implicit multiplication. For example, AB -> A*B and A(1) -> A*(1)
+  --no-fix-floating-point
+                        Do not attempt to fix floating point arithmetic errors. For example, 1.1 * 3 would normally say 3.3000000000000003 instead of 3.3
   -r, --run             Runs the program after it's done transpiling. Will not print to stdout
   -V, --version         show program's version number and exit
 ```
@@ -84,7 +87,7 @@ from ti842py import transpile
 
 transpile("tiprogram.txt", "tiprogram.py")
 ```
-Again, if the second argument is not supplied, the program will be written to `stdout`. The `transpile` command can be supplied with 4 optional arguments, `decompileFile`, `forceDecompile`, `multiplication`, and `run`. `decompileFile` and `multiplication` default to `True`, and `forceDecompile` and `run` default to `False`
+Again, if the second argument is not supplied, the program will be written to `stdout`. The `transpile` command can be supplied with 4 optional arguments, `decompileFile`, `forceDecompile`, `multiplication`, `floating_point`, and `run`. `decompileFile`, `multiplication`, and `floating_point` default to `True`, and `forceDecompile` and `run` default to `False`
 
 The last way that ti842py can be ran is by running the main python file. After cloning the repository, cd into the repository and run `python ti842py/main.py inputfile.txt`. You can supply any arguments that you would supply with the `ti842py` command.
 
@@ -108,3 +111,5 @@ The last way that ti842py can be ran is by running the main python file. After c
  - [getkey](https://github.com/kcsaff/getkey) - for non-blocking input support
 
  - [pythondialog](http://pythondialog.sourceforge.net/doc/) - Python wrapper around `dialog` for `Menu` support
+
+ - [token_utils](https://github.com/aroberge/token-utils) - Support for fixing implicit multiplication

@@ -27,7 +27,7 @@ def isUTF8(file):
 		return True
 
 
-def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, run=False):
+def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, floating_point=True, run=False):
 
 	decode = not isUTF8(infile) and decompileFile is True
 
@@ -36,7 +36,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with tempfile.NamedTemporaryFile() as f:
 			btb.decompile_file(infile, f.name)
 			with open(f.name, 'r') as fp:
-				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()], multiplication).toPython()
+				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()], multiplication, floating_point).toPython()
 
 	else:
 		# Dont decompile
@@ -45,7 +45,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with open(infile, 'r') as f:
 			file_lines = [line.strip() for line in f.readlines()]
 
-		pythonCode = TIBasicParser(file_lines, multiplication).toPython()
+		pythonCode = TIBasicParser(file_lines, multiplication, floating_point).toPython()
 
 	# Write to outfile
 	if outfile == "stdout":
@@ -108,6 +108,13 @@ def main():
 	)
 
 	parser.add_argument(
+		'--no-fix-floating-point',
+		action='store_false',
+		help='Do not attempt to fix floating point arithmetic errors. For example, 1.1 * 3 would normally say 3.3000000000000003 instead of 3.3',
+		dest='floating_point'
+	)
+
+	parser.add_argument(
 		'-r',
 		'--run',
 		action="store_true",
@@ -123,7 +130,7 @@ def main():
 	)
 
 	args = parser.parse_args()
-	transpile(args.infile[0], args.outfile, args.n, args.d, args.multiplication, args.run)
+	transpile(args.infile[0], args.outfile, args.n, args.d, args.multiplication, args.floating_point, args.run)
 
 
 if __name__ == "__main__":
