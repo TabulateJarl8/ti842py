@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.WARNING)
 
 
 class TIBasicParser:
-	def __init__(self, basic, multiplication, floating_point):
+	def __init__(self, basic, multiplication, floating_point, turbo_draw):
 		if isinstance(basic, list):
 			self.basic = basic
 		elif isinstance(basic, str):
@@ -23,6 +23,7 @@ class TIBasicParser:
 
 		self.multiplication = multiplication
 		self.floating_point = floating_point
+		self.turbo_draw = turbo_draw
 
 		# Utility Functions
 		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}, "math": {"code": [""], "imports": ["import math"], "enabled": False}, 'random': {'code': [''], 'imports': ['import random'], 'enabled': False}}
@@ -37,6 +38,9 @@ class TIBasicParser:
 
 		if self.floating_point:
 			self.UTILS['fix_floating_point']['enabled'] = True
+
+		if self.turbo_draw:
+			self.UTILS['draw']['code'] = [line for line in self.UTILS['draw']['code'] if '@_slow' not in line]
 
 		self.drawLock = False
 

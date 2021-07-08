@@ -76,6 +76,7 @@ optional arguments:
                         Do not attempt to fix implicit multiplication. For example, AB -> A*B and A(1) -> A*(1)
   --no-fix-floating-point
                         Do not attempt to fix floating point arithmetic errors. For example, 1.1 * 3 would normally say 3.3000000000000003 instead of 3.3
+  --turbo-draw          Remove the 0.1 second delay between drawing actions
   -r, --run             Runs the program after it's done transpiling. Will not print to stdout
   -V, --version         show program's version number and exit
 ```
@@ -87,7 +88,7 @@ from ti842py import transpile
 
 transpile("tiprogram.txt", "tiprogram.py")
 ```
-Again, if the second argument is not supplied, the program will be written to `stdout`. The `transpile` command can be supplied with 4 optional arguments, `decompileFile`, `forceDecompile`, `multiplication`, `floating_point`, and `run`. `decompileFile`, `multiplication`, and `floating_point` default to `True`, and `forceDecompile` and `run` default to `False`
+Again, if the second argument is not supplied, the program will be written to `stdout`. The `transpile` command can be supplied with optional arguments. `decompileFile`, `multiplication`, and `floating_point` default to `True`, and `forceDecompile`, `run`, and `turbo_draw` default to `False`
 
 The last way that ti842py can be ran is by running the main python file. After cloning the repository, cd into the repository and run `python ti842py/main.py inputfile.txt`. You can supply any arguments that you would supply with the `ti842py` command.
 

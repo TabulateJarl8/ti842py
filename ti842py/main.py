@@ -27,7 +27,7 @@ def isUTF8(file):
 		return True
 
 
-def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, floating_point=True, run=False):
+def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, floating_point=True, turbo_draw=False, run=False):
 
 	decode = not isUTF8(infile) and decompileFile is True
 
@@ -36,7 +36,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with tempfile.NamedTemporaryFile() as f:
 			btb.decompile_file(infile, f.name)
 			with open(f.name, 'r') as fp:
-				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()], multiplication, floating_point).toPython()
+				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()], multiplication, floating_point, turbo_draw).toPython()
 
 	else:
 		# Dont decompile
@@ -45,7 +45,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with open(infile, 'r') as f:
 			file_lines = [line.strip() for line in f.readlines()]
 
-		pythonCode = TIBasicParser(file_lines, multiplication, floating_point).toPython()
+		pythonCode = TIBasicParser(file_lines, multiplication, floating_point, turbo_draw).toPython()
 
 	# Write to outfile
 	if outfile == "stdout":
@@ -115,6 +115,12 @@ def main():
 	)
 
 	parser.add_argument(
+		'--turbo-draw',
+		action='store_true',
+		help='Remove the 0.1 second delay between drawing actions'
+	)
+
+	parser.add_argument(
 		'-r',
 		'--run',
 		action="store_true",
@@ -130,7 +136,7 @@ def main():
 	)
 
 	args = parser.parse_args()
-	transpile(args.infile[0], args.outfile, args.n, args.d, args.multiplication, args.floating_point, args.run)
+	transpile(args.infile[0], args.outfile, args.n, args.d, args.multiplication, args.floating_point, args.turbo_draw, args.run)
 
 
 if __name__ == "__main__":
