@@ -144,7 +144,7 @@ class TIBasicParser:
 			self.indentIncrease = True
 		# Repeat loop (tests at bottom)
 		elif line.startswith("Repeat "):
-			statement = ["firstPass = True", "while firstPass == True or not (" + parsing_utils.fixEquals(line[7:]) + "):", "\tfirstPass = False"]
+			statement = ["firstPass = True", "while firstPass is True or not (" + parsing_utils.fixEquals(line[7:]) + "):", "\tfirstPass = False"]
 			self.indentIncrease = True
 		# Pause
 		elif line.startswith("Pause"):
