@@ -434,4 +434,8 @@ class TIBasicParser:
 
 		self.pythonCode += ["if __name__ == \"__main__\":", "\tmain()"]
 
+		if self.UTILS['draw']['enabled'] is True:
+			# hang on end if drawing
+			self.pythonCode += ['\tinput()']
+
 		return self.pythonCode
