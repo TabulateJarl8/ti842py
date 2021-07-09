@@ -414,6 +414,17 @@ class TIBasicParser:
 				self.indentLevel += 1
 				self.indentIncrease = False
 
+		# Hand of end if drawing
+		if self.UTILS['draw']['enabled'] is True:
+			# hang on end if drawing
+			self.pythonCode += [
+				'\ttry:',
+				'\t\twhile True:',
+				'\t\t\tdraw.win.getMouse()',
+				'\texcept GraphicsError:',
+				'\t\tpass'
+			]
+
 		# Decorate main with with_goto if goto is used
 		if self.UTILS["goto"]["enabled"] is True:
 			self.pythonCode.insert(0, "@with_goto")
@@ -433,9 +444,5 @@ class TIBasicParser:
 		self.pythonCode = neededImports + self.pythonCode
 
 		self.pythonCode += ["if __name__ == \"__main__\":", "\tmain()"]
-
-		if self.UTILS['draw']['enabled'] is True:
-			# hang on end if drawing
-			self.pythonCode += ['\tinput()']
 
 		return self.pythonCode
