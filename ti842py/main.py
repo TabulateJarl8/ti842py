@@ -59,7 +59,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 				proc = subprocess.Popen([sys.executable, f.name])
 				try:
 					proc.wait()
-				except Exception:
+				except (Exception, KeyboardInterrupt):
 					proc.terminate()
 	else:
 		with open(outfile, 'w') as f:
