@@ -43,7 +43,8 @@ ti842py is a TI-BASIC to Python 3 transpiler. A transpiler is a piece of softwar
  - `Ans`
 
 ### Known issues
- - Calling `Prompt` after `Output` will write to STDOUT over the Output
+
+Issues can be found at [https://github.com/TabulateJarl8/ti842py/issues](https://github.com/TabulateJarl8/ti842py/issues)
 
 # Installation
 
