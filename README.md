@@ -56,6 +56,8 @@ ti842py can be installed via PyPI or by cloning the repository. To install it wi
 
 ----
 
+Feel free to use the programs found at [https://github.com/TabulateJarl8/tiprograms](https://github.com/TabulateJarl8/tiprograms) to test this project out.
+
 ti842py can be used in 3 different ways. The first way is just running it from the command line. For example, if you wanted to convert the program in `tiprogram.txt` to `tiprogram.py`, you can this command: `ti842py tiprogram.txt -o tiprogram.py`. If no value is specified for `-o`, the converted program will be written to `stdout`. The `-n` flag can be added to force the transpiler to not decompile the input file, and the `-d` flag can be added to force the transpiler to attempt and decompile the input file. If the `--run` or `-r` argument is supplied, the resulting python file will be run after it is done transpiling
 
 ```
