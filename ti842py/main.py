@@ -4,6 +4,8 @@ import os
 import tempfile
 import sys
 import subprocess
+import io
+import pty
 
 try:
 	from .tiParser import TIBasicParser
@@ -29,6 +31,16 @@ def isUTF8(file):
 
 def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, floating_point=True, turbo_draw=False, run=False):
 
+	# detect stdin
+	if not os.path.exists(infile.name):
+		# Don't auto close since we are shadowing infile
+		temp_stdin = tempfile.NamedTemporaryFile()
+		temp_stdin.write(infile.buffer.read())
+		temp_stdin.seek(0)
+		infile = temp_stdin.name
+	else:
+		infile = infile.name
+
 	decode = not isUTF8(infile) and decompileFile is True
 
 	if decode is True or forceDecompile is True:
@@ -47,6 +59,10 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 
 		pythonCode = TIBasicParser(file_lines, multiplication, floating_point, turbo_draw).toPython()
 
+	# Close temp_stdin if used
+	if 'temp_stdin' in vars() or 'temp_stdin' in globals():
+		temp_stdin.close()
+
 	# Write to outfile
 	if outfile == "stdout":
 		if run is False:
@@ -56,7 +72,16 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 				for line in pythonCode:
 					f.write(line.encode() + b"\n")
 				f.seek(0)
-				proc = subprocess.Popen([sys.executable, f.name])
+
+				# test if something was piped to stdin
+				if 'temp_stdin' in vars() or 'temp_stdin' in globals():
+					# Create new tty to handle ioctl errors in termios
+					master_fd, slave_fd = pty.openpty()
+					proc = subprocess.Popen([sys.executable, f.name], stdin=slave_fd)
+				else:
+					# Nothing was piped to stdin
+					proc = subprocess.Popen([sys.executable, f.name])
+
 				try:
 					proc.wait()
 				except (Exception, KeyboardInterrupt):
@@ -71,11 +96,13 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 
 def main():
 	parser = argparse.ArgumentParser(description='TI-BASIC to Python 3 Transpiler')
-	parser.add_argument(
+	infile_argument = parser.add_argument(
 		'infile',
 		metavar='infile',
-		nargs=1,
-		help="Input file."
+		nargs='?',
+		type=argparse.FileType('r'),
+		default=(None if sys.stdin.isatty() else sys.stdin),
+		help="Input file (filename or stdin)."
 	)
 	parser.add_argument(
 		'-o',
@@ -136,7 +163,16 @@ def main():
 	)
 
 	args = parser.parse_args()
-	transpile(args.infile[0], args.outfile, args.n, args.d, args.multiplication, args.floating_point, args.turbo_draw, args.run)
+
+	if hasattr(args.infile, '__getitem__'):
+		infile = args.infile[0]
+	else:
+		infile = args.infile
+
+	if infile is None:
+		raise argparse.ArgumentError(infile_argument, 'the infile argument is required')
+
+	transpile(infile, args.outfile, args.n, args.d, args.multiplication, args.floating_point, args.turbo_draw, args.run)
 
 
 if __name__ == "__main__":

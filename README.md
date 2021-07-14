@@ -62,15 +62,17 @@ ti842py can be installed via PyPI or by cloning the repository. To install it wi
 
 Feel free to use the programs found at [https://github.com/TabulateJarl8/tiprograms](https://github.com/TabulateJarl8/tiprograms) to test this project out.
 
+## CLI Usage
+
 ti842py can be used in 3 different ways. The first way is just running it from the command line. For example, if you wanted to convert the program in `tiprogram.txt` to `tiprogram.py`, you can this command: `ti842py tiprogram.txt -o tiprogram.py`. If no value is specified for `-o`, the converted program will be written to `stdout`. The `-n` flag can be added to force the transpiler to not decompile the input file, and the `-d` flag can be added to force the transpiler to attempt and decompile the input file. If the `--run` or `-r` argument is supplied, the resulting python file will be run after it is done transpiling
 
 ```
-usage: ti842py [-h] [-o OUTFILE] [-n] [-d] [--no-fix-multiplication] [-r] [-V] infile
+usage: ti842py [-h] [-o OUTFILE] [-n] [-d] [--no-fix-multiplication] [--no-fix-floating-point] [--turbo-draw] [-r] [-V] [infile]
 
 TI-BASIC to Python 3 Transpiler
 
 positional arguments:
-  infile                Input file.
+  infile                Input file (filename or stdin).
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -87,6 +89,19 @@ optional arguments:
   -r, --run             Runs the program after it's done transpiling. Will not print to stdout
   -V, --version         show program's version number and exit
 ```
+
+### Advanced terminal usage
+
+You can use ti842py by piping files to it's stdin. This can be done via pipes or redirects, and the files can be either 8Xp or plain text files, just like normal. Here's some examples:
+
+```sh
+$ cat BAR.8Xp | ti842py --run
+$ ti842py -o bar.py < BAR.8Xp
+$ cat CLOCK.bas | ti842py -nr
+$ ti842py --no-fix-floating-point --run < CLOCK.bas
+```
+
+## Programmatic Usage
 
 ti842py can also be imported and used in a program. Here is an example program to convert `tiprogram.txt` to `tiprogram.py`:
 
