@@ -32,14 +32,15 @@ def isUTF8(file):
 def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, floating_point=True, turbo_draw=False, run=False):
 
 	# detect stdin
-	if not os.path.exists(infile.name):
-		# Don't auto close since we are shadowing infile
-		temp_stdin = tempfile.NamedTemporaryFile()
-		temp_stdin.write(infile.buffer.read())
-		temp_stdin.seek(0)
-		infile = temp_stdin.name
-	else:
-		infile = infile.name
+	if hasattr(infile, 'name'):
+		if not os.path.exists(infile.name):
+			# Don't auto close since we are shadowing infile
+			temp_stdin = tempfile.NamedTemporaryFile()
+			temp_stdin.write(infile.buffer.read())
+			temp_stdin.seek(0)
+			infile = temp_stdin.name
+		else:
+			infile = infile.name
 
 	decode = not isUTF8(infile) and decompileFile is True
 
