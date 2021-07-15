@@ -131,7 +131,7 @@ The last way that ti842py can be ran is by running the main python file. After c
 
  - [insignification's fork of the goto module](https://github.com/insignification/python-goto/tree/fix2) - for `goto`/`lbl` support
 
- - [pnput](https://github.com/moses-palmer/pynput) - for non-blocking input support
+ - [pynput](https://github.com/moses-palmer/pynput) - for non-blocking input support
 
  - [pythondialog](http://pythondialog.sourceforge.net/doc/) - Python wrapper around `dialog` for `Menu` support
 
