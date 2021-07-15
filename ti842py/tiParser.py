@@ -299,8 +299,8 @@ class TIBasicParser:
 			statement = [statement]
 
 		if "getKey" in ' '.join(statement):
-			# Replace getKey with getKey() if getKey is not inside of quotes
-			statement = parsing_utils.noStringReplace(r'getKey(?!\()+', "getKey()", statement)
+			# Replace getKey with get_key.get_last_key() if getKey is not inside of quotes
+			statement = parsing_utils.noStringReplace(r'getKey(?!\()+', "get_key.get_last_key()", statement)
 			self.UTILS["getKey"]["enabled"] = True
 		if "[theta]" in ' '.join(statement):
 			# Replace [theta] with theta if [theta] is not inside of quotes

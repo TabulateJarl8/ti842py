@@ -1,84 +1,97 @@
-import getkey
+import pynput
 
-keyMap = {
-	"\x1bOP": 11,
-	"\x1bOQ": 12,
-	"\x1bOR": 13,
-	"\x1bOS": 14,
-	"\x1b[15~": 15,
-	"~": 21,
-	"\x1b[17~": 22,
-	"\x1b[3~": 23,
-	"\x1b[D": 24,
-	"\x1b[A": 25,
-	"\x1b[C": 26,
-	"`": 31,
-	"\x1b[21~": 32,
-	"\x1b[18~": 33,
-	"\x1b[B": 34,
-	"a": 41,
-	"b": 42,
-	"c": 43,
-	"\x1b[19~": 44,
-	"\x1b[20~": 45,
-	"d": 51,
-	"e": 52,
-	"f": 53,
-	"g": 54,
-	"h": 55,
-	"^": 5,
-	"i": 61,
-	",": 62,
-	"j": 62,
-	"(": 63,
-	"k": 63,
-	")": 64,
-	"l": 64,
-	"/": 65,
-	"m": 65,
-	"÷": 65,
-	"n": 71,
-	"7": 72,
-	"o": 72,
-	"8": 73,
-	"p": 73,
-	"9": 74,
-	"q": 74,
-	"×": 75,
-	"*": 75,
-	"r": 75,
-	"s": 81,
-	"4": 82,
-	"t": 82,
-	"5": 83,
-	"u": 83,
-	"6": 84,
-	"v": 84,
-	"-": 85,
-	"−": 85,
-	"w": 85,
-	"=": 91,
-	"x": 91,
-	"1": 92,
-	"y": 92,
-	"2": 93,
-	"z": 93,
-	"3": 94,
-	"+": 95,
-	"\"": 95,
-	"0": 102,
-	" ": 102,
-	".": 103,
-	":": 103,
-	"-": 104,
-	"?": 104,
-	"−": 104,
-	"\n": 105
-}
+class GetKey:
+	def __init__(self):
+		self.last_key = 0
+		self.keymap = {
+			pynput.keyboard.Key.f1: 11,
+			pynput.keyboard.Key.f2: 12,
+			pynput.keyboard.Key.f3: 13,
+			pynput.keyboard.Key.f4: 14,
+			pynput.keyboard.Key.f5: 15,
+			"`": 21,
+			pynput.keyboard.Key.f6: 22,
+			pynput.keyboard.Key.delete: 23,
+			pynput.keyboard.Key.left: 24,
+			pynput.keyboard.Key.up: 25,
+			pynput.keyboard.Key.right: 26,
+			"~": 31,
+			pynput.keyboard.Key.f10: 32,
+			pynput.keyboard.Key.f7: 33,
+			pynput.keyboard.Key.down: 34,
+			"a": 41,
+			"b": 42,
+			"c": 43,
+			pynput.keyboard.Key.f8: 44,
+			pynput.keyboard.Key.f9: 45,
+			"d": 51,
+			"e": 52,
+			"f": 53,
+			"g": 54,
+			"h": 55,
+			"^": 55,
+			"i": 61,
+			",": 62,
+			"j": 62,
+			"(": 63,
+			"k": 63,
+			")": 64,
+			"l": 64,
+			"/": 65,
+			"m": 65,
+			"÷": 65,
+			"n": 71,
+			"7": 72,
+			"o": 72,
+			"8": 73,
+			"p": 73,
+			"9": 74,
+			"q": 74,
+			"×": 75,
+			"*": 75,
+			"r": 75,
+			"s": 81,
+			"4": 82,
+			"t": 82,
+			"5": 83,
+			"u": 83,
+			"6": 84,
+			"v": 84,
+			"-": 85,
+			"−": 85,
+			"w": 85,
+			"=": 91,
+			"x": 91,
+			"1": 92,
+			"y": 92,
+			"2": 93,
+			"z": 93,
+			"3": 94,
+			"+": 95,
+			"\"": 95,
+			"0": 102,
+			" ": 102,
+			".": 103,
+			":": 103,
+			"-": 104,
+			"?": 104,
+			"−": 104,
+			pynput.keyboard.Key.enter: 105
+		}
 
+	def set_last_key(self, key):
+		if hasattr(key, 'char'):
+			# convert to string
+			key = key.char.lower()
 
-def getKey():
-	key = getkey.getkey(blocking=False)
-	if key in keyMap:
-		return keyMap[key]
-	return 0
+		if key in self.keymap:
+			self.last_key = self.keymap[key]
+
+	def get_last_key(self):
+		key = self.last_key
+		self.last_key = 0
+		return key
+
+get_key = GetKey()
+listener = pynput.keyboard.Listener(on_press=get_key.set_last_key)
+listener.start()
