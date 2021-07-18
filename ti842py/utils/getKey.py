@@ -73,9 +73,7 @@ class GetKey:
 			" ": 102,
 			".": 103,
 			":": 103,
-			"-": 104,
 			"?": 104,
-			"−": 104,
 			pynput.keyboard.Key.enter: 105
 		}
 

@@ -2,6 +2,7 @@ from graphics import *
 import time
 import tkinter.font as tkfont
 import decimal
+import re
 
 
 BLUE = 10
@@ -64,8 +65,9 @@ class Draw:
 		color = str(color)
 		for color1, color2 in self.colors.items():
 			color = color.replace(color1, color2)
-		for color1, color2 in self.colorNumbers.items():
-			color = color.replace(color1, color2)
+		color = re.sub(r'(\d+)', lambda m: self.colorNumbers.get(m.group(), '[ERR:DOMAIN]'), color)
+		if '[ERR:DOMAIN]' in color:
+			raise ValueError('The specified color value was not in range 10-24')
 		if color not in self.colors.values():
 			# Failsafe
 			if not isBackground:
