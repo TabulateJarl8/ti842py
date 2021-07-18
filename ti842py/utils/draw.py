@@ -65,7 +65,7 @@ class Draw:
 
 	def tiColorToGraphicsColor(self, color, isBackground=False):
 		if color not in range(1, 25):
-			raise InvalidColorError(f'The specified color value "{color}" was not in range 1-24')
+			raise InvalidColorError(f'The specified color value "{color}" is not in range 1-24')
 		color = str(color)
 
 		color = re.sub(r'(\d+)', lambda m: self.colors.get(m.group(), '[ERR:DOMAIN]'), color)
