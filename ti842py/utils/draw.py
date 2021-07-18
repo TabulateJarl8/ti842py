@@ -21,6 +21,9 @@ MEDGRAY = 22
 GRAY = 23
 DARKGRAY = 24
 
+class InvalidColorError(Exception):
+	pass
+
 class Draw:
 	def __init__(self):
 		self.win = None
@@ -28,10 +31,9 @@ class Draw:
 		self.pixels = {}
 		self.points = {}
 		self.texts = {}
-		self.colors = {'BLUE': 'blue', 'RED': 'red', 'BLACK': 'black', 'MAGENTA': 'magenta', 'GREEN': 'green', 'ORANGE': 'orange', 'BROWN': 'brown', 'NAVY': 'navy', 'LTBLUE': 'light sky blue', 'YELLOW': 'yellow', 'WHITE': 'white', 'LTGRAY': 'light gray', 'MEDGRAY': 'dark gray', 'GRAY': 'gray', 'DARKGRAY': 'dark slate gray'}
-		self.colorNumbers = {'10': 'blue', '11': 'red', '12': 'black', '13': 'magenta', '14': 'green', '15': 'orange', '16': 'brown', '17': 'navy', '18': 'light sky blue', '19': 'yellow', '20': 'white', '0': 'white', '21': 'light gray', '22': 'dark gray', '23': 'gray', '24': 'dark slate gray'}
+		self.colors = {'10': 'blue', '11': 'red', '12': 'black', '13': 'magenta', '14': 'green', '15': 'orange', '16': 'brown', '17': 'navy', '18': 'light sky blue', '19': 'yellow', '20': 'white', '0': 'white', '21': 'light gray', '22': 'dark gray', '23': 'gray', '24': 'dark slate gray'}
 		for _ in range(1, 10):
-			self.colorNumbers[str(_)] = 'blue'
+			self.colors[str(_)] = 'blue'
 		self.currentTextColor = 'blue'
 
 	def _slow(function):
@@ -63,19 +65,14 @@ class Draw:
 
 	def tiColorToGraphicsColor(self, color, isBackground=False):
 		color = str(color)
-		for color1, color2 in self.colors.items():
-			color = color.replace(color1, color2)
-		color = re.sub(r'(\d+)', lambda m: self.colorNumbers.get(m.group(), '[ERR:DOMAIN]'), color)
+		original_color = color
+
+		if color.find('-') != -1: # negative numbers
+			raise InvalidColorError(f'The specified color value "{original_color}" was not in range 1-24')
+		color = re.sub(r'(\d+)', lambda m: self.colors.get(m.group(), '[ERR:DOMAIN]'), color)
 		if '[ERR:DOMAIN]' in color:
-			raise ValueError('The specified color value was not in range 1-24')
-		if color not in self.colors.values():
-			# Failsafe
-			if not isBackground:
-				print(f'WARNING: Unknown color: {color}. defaulting to blue.')
-				color = 'blue'
-			else:
-				print(f'WARNING: Unknown color: {color}. defaulting to white.')
-				color = 'white'
+			raise InvalidColorError(f'The specified color value "{original_color}" was not in range 1-24')
+
 		return color
 
 	@_slow
