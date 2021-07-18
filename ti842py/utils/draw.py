@@ -64,14 +64,11 @@ class Draw:
 		return horiz, vertical
 
 	def tiColorToGraphicsColor(self, color, isBackground=False):
+		if color not in range(1, 25):
+			raise InvalidColorError(f'The specified color value "{color}" was not in range 1-24')
 		color = str(color)
-		original_color = color
 
-		if color.find('-') != -1: # negative numbers
-			raise InvalidColorError(f'The specified color value "{original_color}" was not in range 1-24')
 		color = re.sub(r'(\d+)', lambda m: self.colors.get(m.group(), '[ERR:DOMAIN]'), color)
-		if '[ERR:DOMAIN]' in color:
-			raise InvalidColorError(f'The specified color value "{original_color}" was not in range 1-24')
 
 		return color
 

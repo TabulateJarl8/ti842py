@@ -227,7 +227,7 @@ class TIBasicParser:
 		# Background On
 		elif line.startswith('BackgroundOn '):
 			statement = line.replace('BackgroundOn ', 'draw.backgroundOn(')
-			statement = statement.split('(')[0] + '("' + statement.split('(')[1] + '")'
+			statement = statement.split('(')[0] + '(' + statement.split('(')[1] + ')'
 			self.UTILS['draw']['enabled'] = True
 
 		# ClrDraw
