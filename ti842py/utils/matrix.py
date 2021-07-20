@@ -302,9 +302,9 @@ class Matrix:
 		# We do not need __setitem__ because the user should not be messing
 		# with the parent lists directly. __getitem__ is enough to interface
 		# with the child lists contained within self.matrix
-		return self.matrix[index - 1] # indexes start at 1 in TI-BASIC
+		return self.matrix[index] # indexes start at 1 in TI-BASIC
 
 	def __call__(self, row, col):
 		# TI-BASIC matrices are accessed like [A](1, 2), so I've implemented
 		# that here. Uses __getitem__
-		return self.__getitem__(row - 1)[col - 1] # indexes start at 1 in TI-BASIC
+		return self.__getitem__(row)[col] # indexes start at 1 in TI-BASIC
