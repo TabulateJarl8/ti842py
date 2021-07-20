@@ -1,6 +1,7 @@
 import decimal
 import copy
 import operator
+import math
 
 class DimensionMismatchError(Exception):
 	pass
@@ -168,8 +169,8 @@ class Matrix:
 
 
 	def __len__(self):
-		# Return rows
-		return self.shape()[0]
+		# Return rows, cols
+		return self.shape()
 
 	def __mul__(self, other):
 		if isinstance(other, Matrix):
@@ -264,7 +265,19 @@ class Matrix:
 
 		return self
 
+	def __floor__(self):
+		new_matrix = copy.deepcopy(self.matrix)
+		for i in range(len(new_matrix)):
+			for j in range(len(new_matrix[i])):
+				new_matrix[i][j] = math.floor(new_matrix[i][j])
+		return Matrix(new_matrix)
 
+	def __abs__(self):
+		new_matrix = copy.deepcopy(self.matrix)
+		for i in range(len(new_matrix)):
+			for j in range(len(new_matrix[i])):
+				new_matrix[i][j] = abs(new_matrix[i][j])
+		return Matrix(new_matrix)
 
 	def __neg__(self):
 		new_matrix = copy.deepcopy(self.matrix)
@@ -272,8 +285,6 @@ class Matrix:
 			for j in range(len(new_matrix[i])):
 				new_matrix[i][j] = -new_matrix[i][j]
 		return Matrix(new_matrix)
-
-
 
 	def __eq__(self, other):
 		return 1 if self.matrix == other.matrix else 0
@@ -294,30 +305,4 @@ class Matrix:
 		# TI-BASIC matrices are accessed like [A](1, 2), so I've implemented
 		# that here. Uses __getitem__
 		return self.__getitem__(row)[col]
-
-test = Matrix()
-test2 = Matrix()
-# test.reshape(3, 3)
-# test[0][1] = 3
-# print(test[0][1])
-# print(test(0, 1))
-# test.reshape(2, 3)
-#
-# test.reshape(4, 3)
-# print(test)
-# print()
-# print(test*3)
-# test*=3
-# print()
-# print(test)
-test.matrix = [[2, 3], [2, 3]]
-test2.matrix = [[1,2],[3,4]]
-print(test2**1)
-print()
-print(test2**0)
-print()
-print(test2 ** -1)
-# print(3*test2)
-# print(test2 * 0)
-# print(test*test2)
-# print(test == test2)
+		

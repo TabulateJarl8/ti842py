@@ -346,6 +346,10 @@ class TIBasicParser:
 			except ValueError:
 				statement = parsing_utils.noStringReplace(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + m.group(2) + ']', statement)
 
+		if 'int(' in ' '.join(statement):
+			statement = parsing_utils.noStringReplace('int(', 'math.floor(', statement)
+			self.UTILS['math']['enabled'] = True
+
 		if 'randInt(' in ' '.join(statement):
 			# Replace randInt with random.randint
 			statement = parsing_utils.noStringReplace('randInt', 'random.randint', statement)
