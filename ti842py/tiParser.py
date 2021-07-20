@@ -371,7 +371,7 @@ class TIBasicParser:
 			statement = parsing_utils.noStringReplace(r'\[([A-J])\]', r'matrix_\1', statement)
 			statement = parsing_utils.noStringReplace(r'(matrix_[A-J])\((.+),(.+?)\)', lambda m: m.group(1) + '[' + m.group(2) + ' - 1][' + m.group(3) + ' - 1]', statement)
 			statement = parsing_utils.noStringReplace(r'len\((matrix_[A-J])\)\s*=\s*\[(.+),(.+?)\]', r'\1.reshape(\2, \3)', statement)
-			statement = parsing_utils.noStringReplace(r'(matrix_[A-J])\s*=\s*(\[\[.*\]\])', r'\1 = Matrix(\2)', statement)
+			statement = parsing_utils.noStringReplace(r'(matrix_[A-J])\s*=\s*(\[\[.*\]\])', lambda m: m.group(1) + ' = Matrix(' + m.group(2).replace('][', '], [') + ')', statement)
 			self.UTILS['matrix']['enabled'] = True
 
 		if 'int(' in ' '.join(statement):
