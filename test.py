@@ -8,6 +8,9 @@ class DimensionMismatchError(Exception):
 class InvalidDimensionError(Exception):
 	pass
 
+class SingularMatrixError(Exception):
+	pass
+
 class Matrix:
 	def __init__(self, init_matrix=None):
 		if init_matrix is None:
@@ -115,10 +118,53 @@ class Matrix:
 
 	def _invert_matrix(self, matrix):
 		'''
-		Invert a matrix
+		Invert a matrix object
+		Mostly taken from https://stackoverflow.com/a/39881366/11591238
 		'''
 
-		
+		def transposeMatrix(m):
+			return map(list, zip(*m))
+
+		def getMatrixMinor(m, i, j):
+			return [row[:j] + row[j + 1:] for row in (m[:i] + m[i + 1:])]
+
+		def getMatrixDeternminant(m):
+			#base case for 2x2 matrix
+			if len(m) == 2:
+				return m[0][0] * m[1][1] - m[0][1] * m[1][0]
+
+			determinant = 0
+			for c in range(len(m)):
+				determinant += ((-1) ** c) * m[0][c] * getMatrixDeternminant(getMatrixMinor(m, 0, c))
+			return determinant
+
+		def getMatrixInverse(m):
+			determinant = getMatrixDeternminant(m)
+			#special case for 2x2 matrix:
+			if len(m) == 2:
+				return [[m[1][1] / determinant, -1 * m[0][1] / determinant],
+						[-1 * m[1][0] / determinant, m[0][0] / determinant]]
+
+			#find matrix of cofactors
+			cofactors = []
+			for r in range(len(m)):
+				cofactorRow = []
+				for c in range(len(m)):
+					minor = getMatrixMinor(m, r, c)
+					cofactorRow.append(((-1) ** (r + c)) * getMatrixDeternminant(minor))
+				cofactors.append(cofactorRow)
+			cofactors = transposeMatrix(cofactors)
+			for r in range(len(cofactors)):
+				for c in range(len(cofactors)):
+					cofactors[r][c] = cofactors[r][c] / determinant
+			return cofactors
+
+		try:
+			new_matrix = getMatrixInverse(matrix.matrix)
+		except ZeroDivisionError as exc:
+			raise SingularMatrixError('No inverse matrix exists.') from exc
+
+		return Matrix(new_matrix)
 
 
 	def __len__(self):
@@ -207,9 +253,18 @@ class Matrix:
 		elif other == 0:
 			return self._generate_zero_matrix(self.shape()[0])
 		elif other == -1:
-			pass
+			return self._invert_matrix(self)
 		else:
 			raise ValueError('Must not be under -1')
+
+	def __ipow__(self, other):
+		new_matrix = self.__pow__(other)
+		self.matrix = copy.deepcopy(new_matrix.matrix)
+		del new_matrix
+
+		return self
+
+
 
 	def __neg__(self):
 		new_matrix = copy.deepcopy(self.matrix)
