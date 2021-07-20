@@ -375,7 +375,7 @@ class TIBasicParser:
 			self.UTILS['matrix']['enabled'] = True
 
 		if 'int(' in ' '.join(statement):
-			statement = parsing_utils.noStringReplace(r'(?<![a-z])int\(', r'math.floor\(', statement)
+			statement = parsing_utils.noStringReplace(r'(?<![a-z])int\(', r'math.floor(', statement)
 			self.UTILS['math']['enabled'] = True
 
 		if 'randInt(' in ' '.join(statement):
