@@ -64,17 +64,6 @@ class TIBasicParser:
 		elif line.startswith("Disp "):
 			statement = re.search("Disp (.*[^)])", line).groups(1)[0]
 			statement = "print(" + parsing_utils.closeOpen(statement) + ", sep=\"\")"
-		# Variables
-		elif "->" in line or "→" in line:
-			statement = re.split("->|→", line)
-			statement.reverse()
-
-			if statement[0] == "rand":
-				# seeding rand
-				statement = "random.seed(" + statement[-1] + ")"
-				self.UTILS["random"]["enabled"] = True
-			else:
-				statement = " = ".join(statement)
 		# If
 		elif line.startswith("If "):
 			try:
@@ -101,6 +90,7 @@ class TIBasicParser:
 					statement = ["if " + parsing_utils.fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
 		elif line == "Then":
 			return None
+
 		# Elif
 		elif line == "Else" and self.basic[index + 1].startswith("If"):
 			statement = "elif " + self.basic[index + 1].lstrip("If ")
@@ -137,19 +127,37 @@ class TIBasicParser:
 		# For loop
 		elif line.startswith("For"):
 			args = line[4:].strip("()").split(",")
-			statement = "for " + args[0] + " in range(" + args[1] + ", " + args[2]
+			statement = "for " + args[0] + " in range(" + args[1] + ", " + str(int(args[2]) + 1)
 			if len(args) == 4:
 				statement += ", " + args[3]
 			statement += "):"
 			self.indentIncrease = True
 		# While loop
 		elif line.startswith("While "):
-			statement = "while " + parsing_utils.fixEquals(line[6:]) + ":"
-			self.indentIncrease = True
+			if re.search(r"While.*[^\"]:", line) is None:
+				statement = "while " + parsing_utils.fixEquals(line[6:]) + ":"
+				self.indentIncrease = True
+			else:
+				# while statement on 1 line
+				statement = ["while " + parsing_utils.fixEquals(line.lstrip("While ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("While ").split(":", 1)[1])]
+
 		# Repeat loop (tests at bottom)
 		elif line.startswith("Repeat "):
 			statement = ["firstPass = True", "while firstPass is True or not (" + parsing_utils.fixEquals(line[7:]) + "):", "\tfirstPass = False"]
 			self.indentIncrease = True
+
+		# Variables
+		elif "->" in line or "→" in line:
+			statement = re.split("->|→", line)
+			statement.reverse()
+
+			if statement[0] == "rand":
+				# seeding rand
+				statement = "random.seed(" + statement[-1] + ")"
+				self.UTILS["random"]["enabled"] = True
+			else:
+				statement = " = ".join(statement)
+
 		# Pause
 		elif line.startswith("Pause"):
 			args = line[5:].strip().split(",")
@@ -281,7 +289,7 @@ class TIBasicParser:
 			self.UTILS['draw']['enabled'] = True
 
 		elif line == 'ClrAllLists':
-			statement = 'l1 = l2 = l3 = l4 = l5 = l6 = [None for _ in range(0, 999)]'
+			statement = 'l1, l2, l3, l4, l5, l6 = ([None for _ in range(0, 999)] for _ in range(6))'
 
 		# Clr single list
 		elif line.startswith('ClrList '):
@@ -289,7 +297,13 @@ class TIBasicParser:
 
 		else:
 			# Things that can be alone on a line
-			if line.startswith("getKey") or line.startswith("abs") or line.startswith("sqrt") or line.startswith("toString(") or line.startswith('randInt(') or line.startswith('rand'):
+			if line.startswith("getKey") or \
+				line.startswith("abs") or \
+				line.startswith("sqrt") or \
+				line.startswith("toString(") or \
+				line.startswith('randInt(') or \
+				line.startswith('rand') or \
+				re.search(r'^\[[A-J]\]', line):
 				statement = line
 			else:
 				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
@@ -297,6 +311,12 @@ class TIBasicParser:
 
 		if isinstance(statement, str):
 			statement = [statement]
+
+		statement = parsing_utils.noStringReplace(r'{', '[', statement)
+		statement = parsing_utils.noStringReplace(r'}', ']', statement)
+		statement = parsing_utils.noStringReplace('≠', '!=', statement)
+		statement = parsing_utils.noStringReplace('≤', '<=', statement)
+		statement = parsing_utils.noStringReplace('≥', '>=', statement)
 
 		if "getKey" in ' '.join(statement):
 			# Replace getKey with get_key.get_last_key() if getKey is not inside of quotes
@@ -328,7 +348,7 @@ class TIBasicParser:
 			statement = parsing_utils.noStringReplace(r'toString\(([^\)]+)\)', r'str(\1)', statement)
 		if "rand" in ' '.join(statement):
 			# Replace rand with random.random() if rand is not inside of quotes
-			statement = parsing_utils.noStringReplace(r'rand(?!\(|I|o)+', 'random.random()', statement)
+			statement = parsing_utils.noStringReplace(r'rand(?!\(|I|i|o)+', 'random.random()', statement)
 			statement = parsing_utils.noStringReplace(r'rand\(([0-9])\)', r'[random.random() for _ in range(\1)]', statement)
 			self.UTILS['random']['enabled'] = True
 		if 'dayOfWk(' in ' '.join(statement):
@@ -346,8 +366,16 @@ class TIBasicParser:
 			except ValueError:
 				statement = parsing_utils.noStringReplace(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + m.group(2) + ']', statement)
 
+		if re.search(r'\[[A-J]\]', ' '.join(statement)):
+			# Matrices
+			statement = parsing_utils.noStringReplace(r'\[([A-J])\]', r'matrix_\1', statement)
+			statement = parsing_utils.noStringReplace(r'(matrix_[A-J])\((.+),(.+?)\)', lambda m: m.group(1) + '[' + m.group(2) + ' - 1][' + m.group(3) + ' - 1]', statement)
+			statement = parsing_utils.noStringReplace(r'len\((matrix_[A-J])\)\s*=\s*\[(.+),(.+?)\]', r'\1.reshape(\2, \3)', statement)
+			statement = parsing_utils.noStringReplace(r'(matrix_[A-J])\s*=\s*(\[\[.*\]\])', r'\1 = Matrix(\2)', statement)
+			self.UTILS['matrix']['enabled'] = True
+
 		if 'int(' in ' '.join(statement):
-			statement = parsing_utils.noStringReplace('int(', 'math.floor(', statement)
+			statement = parsing_utils.noStringReplace(r'(?<![a-z])int\(', r'math.floor\(', statement)
 			self.UTILS['math']['enabled'] = True
 
 		if 'randInt(' in ' '.join(statement):
@@ -379,7 +407,7 @@ class TIBasicParser:
 	def toPython(self):
 		self.pythonCode = []
 
-		self.pythonCode += ["def main():", "\tl1 = l2 = l3 = l4 = l5 = l6 = [None for _ in range(0, 999)] # init lists"]
+		self.pythonCode += ["def main():", "\tl1, l2, l3, l4, l5, l6 = ([None for _ in range(0, 999)] for _ in range(6)) # init lists"]
 		self.pythonCode += ["\tA = B = C = D = E = F = G = H = I = J = K = L = M = N = O = P = Q = R = S = T = U = V = W = X = Y = Z = θ = 0 # init variables"]
 
 		self.indentLevel = 1
@@ -393,7 +421,7 @@ class TIBasicParser:
 		for index, line in enumerate(self.basic):
 			statement = self.convertLine(index, line)
 
-			if self.UTILS['draw']['enabled'] is True and self.drawLock is False:
+			if self.UTILS['draw']['enabled'] and not self.drawLock:
 				self.drawLock = True
 				self.pythonCode.insert(1, '\tdraw.openWindow()')
 				self.pythonCode.insert(1, '\tdraw = Draw()')
@@ -402,7 +430,7 @@ class TIBasicParser:
 				continue
 
 			# Indentation
-			if self.indentDecrease is True:
+			if self.indentDecrease:
 				self.indentLevel -= 1
 				self.indentDecrease = False
 
@@ -414,12 +442,12 @@ class TIBasicParser:
 					self.pythonCode.append("\t" * self.indentLevel + item)
 
 			# Indentation
-			if self.indentIncrease is True:
+			if self.indentIncrease:
 				self.indentLevel += 1
 				self.indentIncrease = False
 
 		# Hand of end if drawing
-		if self.UTILS['draw']['enabled'] is True:
+		if self.UTILS['draw']['enabled']:
 			# hang on end if drawing
 			self.pythonCode += [
 				'\ttry:',
@@ -430,15 +458,18 @@ class TIBasicParser:
 			]
 
 		# Decorate main with with_goto if goto is used
-		if self.UTILS["goto"]["enabled"] is True:
+		if self.UTILS["goto"]["enabled"]:
 			self.pythonCode.insert(0, "@with_goto")
-		if self.UTILS['fix_floating_point']['enabled'] is True:
+		if self.UTILS['fix_floating_point']['enabled']:
 			self.pythonCode.insert(0, '@fix_floating_point')
+		if self.UTILS['matrix']['enabled']:
+			one_line_after_main_definition = self.pythonCode.index('def main():') + 1
+			self.pythonCode.insert(one_line_after_main_definition, '\tmatrix_A, matrix_B, matrix_C, matrix_D, matrix_E, matrix_F, matrix_G, matrix_H, matrix_I, matrix_J = (Matrix() for _ in range(10)) # init matrices')
 
 		# Add required utility functions
 		neededImports = []
 		for item in self.UTILS:
-			if self.UTILS[item]["enabled"] is True:
+			if self.UTILS[item]["enabled"]:
 				# Add code to new file
 				self.pythonCode = self.UTILS[item]["code"] + self.pythonCode
 				for importedPackage in self.UTILS[item]["imports"]:
