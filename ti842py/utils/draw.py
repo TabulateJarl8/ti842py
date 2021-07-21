@@ -64,7 +64,7 @@ class Draw:
 		return horiz, vertical
 
 	def tiColorToGraphicsColor(self, color, isBackground=False):
-		if color not in range(1, 25):
+		if int(color) not in range(1, 25):
 			raise InvalidColorError(f'The specified color value "{color}" is not in range 1-24')
 		color = str(color)
 
@@ -86,14 +86,14 @@ class Draw:
 		self.win.update()
 
 	@_slow
-	def circle(self, x, y, r, color='blue', linestyle=''):
+	def circle(self, x, y, r, color=10, linestyle=''):
 		# TODO: Implement linestyle
 		c = Circle(Point(self.graphCoordsToPixels(x), self.graphCoordsToPixels(y)), r)
 		c.setOutline(self.tiColorToGraphicsColor(color))
 		c.draw(self.win)
 
 	@_slow
-	def line(self, x1, y1, x2, y2, erase=1, color='blue', style=1):
+	def line(self, x1, y1, x2, y2, erase=1, color=10, style=1):
 		# TODO: Erase and style not implemented yet
 		x1, y1 = self.graphCoordsToPixels(x1, y1)
 		x2, y2 = self.graphCoordsToPixels(x2, y2)
@@ -134,7 +134,7 @@ class Draw:
 		self.texts[str(column)][str(row)] = message
 
 	@_slow
-	def pxlOn(self, row, column, color='blue'):
+	def pxlOn(self, row, column, color=10):
 		# Row = y; Column = x
 		pnt = Point(column, row)
 		pnt.setOutline(self.tiColorToGraphicsColor(color))
@@ -158,7 +158,7 @@ class Draw:
 		return False
 
 	@_slow
-	def ptOn(self, x, y, mark=1, color='blue'):
+	def ptOn(self, x, y, mark=1, color=10):
 		x, y = self.graphCoordsToPixels(x, y)
 
 		if str(x) not in self.points:
