@@ -399,6 +399,9 @@ class TIBasicParser:
 			for statement_index, item in enumerate(statement):
 				statement[statement_index] = parsing_utils.toValidEqn(item)
 
+		if 'Ans' in ''.join(statement):
+			self.pythonCode = parsing_utils.last_line_without_variable_assignment_ans(self.pythonCode)
+
 		if isinstance(statement, list) and len(statement) == 1:
 			statement = statement[0]
 

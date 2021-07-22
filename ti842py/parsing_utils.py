@@ -73,6 +73,32 @@ def parenthesis_split(sentence, separator=" ", lparen="(", rparen=")"):
 	return([sentence[i:j].strip(separator) for i, j in zip(l, l[1:])])
 
 
+def last_line_without_variable_assignment_ans(full_code):
+	'''
+	Used for determining Ans
+	'''
+
+	full_code = full_code[::-1]
+
+	for i in range(len(full_code)):
+		if (not full_code[i].strip().endswith(':')) and \
+		(noStringReplace(r'(?<!Ans )=', '', [full_code[i]]) == [full_code[i]]) and \
+		not full_code[i].strip().startswith('#') and \
+		'.lbl' not in full_code[i]:
+			# no loops etc that end with : and nothing with item assignments or comparisons
+			# no comments
+			# if we come across an Ans before finding a statmenet that can use Ans, just use the last Ans statement
+			if not full_code[i].strip().startswith('Ans = '):
+				old_whitespace = full_code[i][:-len(full_code[i].lstrip())]
+				full_code[i] = old_whitespace + 'Ans = ' + full_code[i].lstrip()
+
+			break
+
+
+	return full_code[::-1]
+
+
+
 def menu(title, args):
 	choices = []
 	for i in range(0, len(args), 2):
