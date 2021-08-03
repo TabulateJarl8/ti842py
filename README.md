@@ -1,13 +1,15 @@
-<img src="https://raw.githubusercontent.com/TabulateJarl8/ti842py/master/imgs/ti842py-logo.svg" alt="ti842py Logo" />
 
 <p align="center">
-	<a href="https://badge.fury.io/py/ti842py"><img alt="PyPI" src="https://img.shields.io/pypi/v/ti842py" /></a>
-	<a href="https://pepy.tech/project/ti842py"><img alt="Downloads" src="https://pepy.tech/badge/ti842py" /></a>
-	<a href="https://pypi.python.org/pypi/ti842py/"><img alt="PyPI license" src="https://img.shields.io/pypi/l/ti842py.svg" /></a>
-	<a href="https://GitHub.com/TabulateJarl8/ti842py/graphs/commit-activity"><img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" /></a>
-	<a href="https://GitHub.com/TabulateJarl8/ti842py/issues/"><img alt="GitHub Issues" src="https://img.shields.io/github/issues/TabulateJarl8/ti842py.svg" /></a>
-	<a href="https://github.com/TabulateJarl8"><img alt="GitHub followers" src="https://img.shields.io/github/followers/TabulateJarl8?style=social" /></a>
-	<a href="https://github.com/TabulateJarl8/ti842py"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/TabulateJarl8/ti842py?style=social" /></a>
+<img src="https://raw.githubusercontent.com/TabulateJarl8/ti842py/master/imgs/ti842py-logo.svg" alt="ti842py Logo" width="70%" />
+</p>
+<p align="center">
+<a href="https://badge.fury.io/py/ti842py"><img alt="PyPI" src="https://img.shields.io/pypi/v/ti842py" /></a>
+<a href="https://pepy.tech/project/ti842py"><img alt="Downloads" src="https://pepy.tech/badge/ti842py" /></a>
+<a href="https://pypi.python.org/pypi/ti842py/"><img alt="PyPI license" src="https://img.shields.io/pypi/l/ti842py.svg" /></a>
+<a href="https://GitHub.com/TabulateJarl8/ti842py/graphs/commit-activity"><img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" /></a>
+<a href="https://GitHub.com/TabulateJarl8/ti842py/issues/"><img alt="GitHub Issues" src="https://img.shields.io/github/issues/TabulateJarl8/ti842py.svg" /></a>
+<a href="https://github.com/TabulateJarl8"><img alt="GitHub followers" src="https://img.shields.io/github/followers/TabulateJarl8?style=social" /></a>
+<a href="https://github.com/TabulateJarl8/ti842py"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/TabulateJarl8/ti842py?style=social" /></a>
 </p>
 
 ----
