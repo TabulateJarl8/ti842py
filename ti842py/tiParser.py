@@ -127,7 +127,7 @@ class TIBasicParser:
 		# For loop
 		elif line.startswith("For"):
 			args = line[4:].strip("()").split(",")
-			statement = "for " + args[0] + " in range(" + args[1] + ", " + str(int(args[2]) + 1)
+			statement = "for " + args[0] + " in range(" + args[1] + ", " + args[2] + ' + 1'
 			if len(args) == 4:
 				statement += ", " + args[3]
 			statement += "):"
