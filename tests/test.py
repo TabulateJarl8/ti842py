@@ -1,41 +1,23 @@
-import ti842py
-import traceback
-import os
+import unittest
+import pathlib
+import subprocess
 
-print("")
-print("")
-print(u"\u001b[33m===================================================================\u001b[0m")
-print(u"\u001b[36mInitializing test! (1/2)")
 try:
-	print(u"\u001b[33m===================================================================\u001b[0m")
-	print("ti842py.transpile(\"program.txt\", \"output.py\")")
-	ti842py.transpile("program.txt", "output.py")
-	print(u"\u001b[33m===================================================================\u001b[0m")
-	print("")
-except Exception as e:
-	print(u"\u001b[31m===================================================================\u001b[0m")
-	print(u"\u001b[31mWhoops! Error on calling transpile!\u001b[0m")
-	traceback.print_exc()
-	print(u"\u001b[31m===================================================================\u001b[0m")
-	exit(2)
-print(u"\u001b[33m===================================================================\u001b[0m")
-print(u"\u001b[32mSuccessful Test! (1/2 COMPLETE)\u001b[0m")
-print(u"\u001b[33m===================================================================\u001b[0m")
-print(u"\u001b[36mInitializing test! (2/2)")
-try:
-	print(u"\u001b[33m===================================================================\u001b[0m")
-	print("ti842py -i program.txt -o output.py")
-	os.system("ti842py -i program.txt -o output.py")
-	print(u"\u001b[33m===================================================================\u001b[0m")
-	print("")
-except Exception as e:
-	print(u"\u001b[31m===================================================================\u001b[0m")
-	print(u"\u001b[31mWhoops! Error on calling ti842py!\u001b[0m")
-	traceback.print_exc()
-	print(u"\u001b[31m===================================================================\u001b[0m")
-	exit(2)
-print(u"\u001b[33m===================================================================\u001b[0m")
-print(u"\u001b[32mSuccessful Test! (2/2 COMPLETE)\u001b[0m")
-print(u"\u001b[35mTerminating!\u001b[0m")
-print(u"\u001b[33m===================================================================\u001b[0m")
-exit()
+  import ti842py
+except ImportError as exc:
+  raise ImportError('ti842py is not installed. Please install the local version by running `python3 setup.py sdist` followed by `pip3 install dist/* --force-reinstall` in the root directory of the repository') from exc
+
+parent_directory = pathlib.Path(__file__).parents[1].resolve()
+
+class MainTestCase(unittest.TestCase):
+  def test_traspile(self):
+    ti842py.transpile(str(parent_directory / 'program.txt'), str(parent_directory / 'output.py'))
+
+  def test_command_transpile(self):
+    child = subprocess.Popen(['ti842py', str(parent_directory / 'program.txt'), '-o', str(parent_directory / 'output.py')])
+    child.communicate()
+    self.assertEqual(child.returncode, 0, 'Must exit with code 0')
+
+
+if __name__ == '__main__':
+  unittest.main()
