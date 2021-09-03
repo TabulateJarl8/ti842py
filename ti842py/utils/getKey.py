@@ -70,7 +70,7 @@ class GetKey:
 			"+": 95,
 			"\"": 95,
 			"0": 102,
-			" ": 102,
+			pynput.keyboard.Key.space: 102,
 			".": 103,
 			":": 103,
 			"?": 104,
@@ -89,7 +89,3 @@ class GetKey:
 		key = self.last_key
 		self.last_key = 0
 		return key
-
-get_key = GetKey()
-listener = pynput.keyboard.Listener(on_press=get_key.set_last_key)
-listener.start()

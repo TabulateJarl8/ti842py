@@ -26,7 +26,7 @@ class TIBasicParser:
 		self.turbo_draw = turbo_draw
 
 		# Utility Functions
-		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}, "math": {"code": [""], "imports": ["import math"], "enabled": False}, 'random': {'code': [''], 'imports': ['import random'], 'enabled': False}}
+		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}, "math": {"code": [""], "imports": ["import math"], "enabled": False}, 'random': {'code': [''], 'imports': ['import random'], 'enabled': False}, 'traceback': {'code': [''], 'imports': ['import traceback'], 'enabled': True}}
 		here = os.path.abspath(os.path.dirname(__file__))
 		for file in [file for file in os.listdir(os.path.join(here, "utils")) if os.path.isfile(os.path.join(here, "utils", file))]:
 			with open(os.path.join(here, "utils", file)) as f:
@@ -124,6 +124,13 @@ class TIBasicParser:
 				else:
 					statement = "input()"
 			self.UTILS["toNumber"]["enabled"] = True
+
+			# stop listening for keyboard input on input
+			# these statements will be removed in post-processing if getKey isn't used
+			if not isinstance(statement, list):
+				statement = [statement]
+			statement.insert(0, 'listener.stop()')
+			statement.extend(['listener = pynput.keyboard.Listener(on_press=get_key.set_last_key)', 'listener.start()'])
 		# For loop
 		elif line.startswith("For"):
 			args = line[4:].strip("()").split(",")
@@ -165,6 +172,13 @@ class TIBasicParser:
 				statement = "input("
 				if len(args) == 1:
 					statement += str(args[0]) + ")"
+
+				# stop listening for keyboard input on input
+				# these statements will be removed in post-processing if getKey isn't used
+				if not isinstance(statement, list):
+					statement = [statement]
+				statement.insert(0, 'listener.stop()')
+				statement.extend(['listener = pynput.keyboard.Listener(on_press=get_key.set_last_key)', 'listener.start()'])
 			else:
 				statement = ["print(" + str(args[0]) + ")", "time.sleep(" + args[1] + ")"]
 				self.UTILS["wait"]["enabled"] = True
@@ -187,6 +201,13 @@ class TIBasicParser:
 			else:
 				statement = variable + " = toNumber(input(\"" + variable + "=?\"))"
 			self.UTILS["toNumber"]["enabled"] = True
+
+			# stop listening for keyboard input on input
+			# these statements will be removed in post-processing if getKey isn't used
+			if not isinstance(statement, list):
+				statement = [statement]
+			statement.insert(0, 'listener.stop()')
+			statement.extend(['listener = pynput.keyboard.Listener(on_press=get_key.set_last_key)', 'listener.start()'])
 		# Goto (eww)
 		elif line.startswith("Goto "):
 			statement = "goto .lbl" + line[5:]
@@ -362,13 +383,13 @@ class TIBasicParser:
 		if re.search(r'l[1-6]\([0-9A-Za-z]+\)', ' '.join(statement)):
 			# List subscription
 			try:
-				statement = parsing_utils.noStringReplace(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + str(int(m.group(2)) - 1) + ']', statement)
+				statement = parsing_utils.noStringReplace(r'(l[1-6])\(([0-9A-Z]+)\)', lambda m: m.group(1) + '[' + str(int(m.group(2)) - 1) + ']', statement)
 			except ValueError:
-				statement = parsing_utils.noStringReplace(r'(l[1-6])\(([0-9A-Za-z]+)\)', lambda m: m.group(1) + '[' + m.group(2) + ']', statement)
+				statement = parsing_utils.noStringReplace(r'(l[1-6])\(([0-9A-Z]+)\)', lambda m: m.group(1) + '[' + m.group(2) + ']', statement)
 
 		if re.search(r'\[[A-J]\]', ' '.join(statement)):
 			# Matrices
-			statement = parsing_utils.noStringReplace(r'\[([A-J])\]', r'matrix_\1', statement)
+			statement = parsing_utils.noStringReplace(r'(?<!l[1-6])\[([A-J])\]', r'matrix_\1', statement)
 			statement = parsing_utils.noStringReplace(r'(matrix_[A-J])\((.+),(.+?)\)', lambda m: m.group(1) + '[' + m.group(2) + ' - 1][' + m.group(3) + ' - 1]', statement)
 			statement = parsing_utils.noStringReplace(r'len\((matrix_[A-J])\)\s*=\s*\[(.+),(.+?)\]', r'\1.reshape(\2, \3)', statement)
 			statement = parsing_utils.noStringReplace(r'(matrix_[A-J])\s*=\s*(\[\[.*\]\])', lambda m: m.group(1) + ' = Matrix(' + m.group(2).replace('][', '], [') + ')', statement)
@@ -460,6 +481,17 @@ class TIBasicParser:
 				'\t\tpass'
 			]
 
+		# Remove get_key functions that surround inputs if getKey isn't used
+		if not self.UTILS['getKey']['enabled']:
+			self.pythonCode = parsing_utils.remove_values_from_list(
+				self.pythonCode,
+				(
+					'listener.stop()',
+					'listener = pynput.keyboard.Listener(on_press=get_key.set_last_key)',
+					'listener.start()'
+				)
+			)
+
 		# Decorate main with with_goto if goto is used
 		if self.UTILS["goto"]["enabled"]:
 			self.pythonCode.insert(0, "@with_goto")
@@ -468,6 +500,12 @@ class TIBasicParser:
 		if self.UTILS['matrix']['enabled']:
 			one_line_after_main_definition = self.pythonCode.index('def main():') + 1
 			self.pythonCode.insert(one_line_after_main_definition, '\tmatrix_A, matrix_B, matrix_C, matrix_D, matrix_E, matrix_F, matrix_G, matrix_H, matrix_I, matrix_J = (Matrix() for _ in range(10)) # init matrices')
+		if self.UTILS['getKey']['enabled']:
+			# initialize getKey
+			one_line_after_main_definition = self.pythonCode.index('def main():') + 1
+			self.pythonCode.insert(one_line_after_main_definition, '\tget_key = GetKey()')
+			self.pythonCode.insert(one_line_after_main_definition + 1, '\tlistener = pynput.keyboard.Listener(on_press=get_key.set_last_key)')
+			self.pythonCode.insert(one_line_after_main_definition + 2, '\tlistener.start()')
 
 		# Add required utility functions
 		neededImports = []
@@ -481,6 +519,18 @@ class TIBasicParser:
 						neededImports.append(importedPackage)
 		self.pythonCode = neededImports + self.pythonCode
 
-		self.pythonCode += ["if __name__ == \"__main__\":", "\tmain()"]
+		self.pythonCode += [
+			'if __name__ == \'__main__\':',
+			'\ttry:',
+			'\t\tmain()',
+			'\texcept:',
+			'\t\ttraceback.print_exc()',
+			'\t\ttry:',
+			'\t\t\timport sys, termios',
+			'\t\t\t# clear stdin on unix-like systems',
+			'\t\t\ttermios.tcflush(sys.stdin, termios.TCIFLUSH)',
+			'\t\texcept ImportError:',
+			'\t\t\tpass'
+		]
 
 		return self.pythonCode

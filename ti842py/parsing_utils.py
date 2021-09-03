@@ -207,3 +207,5 @@ def decistmt(s):
 	# Convert token list back into source code
 	return tokenize.untokenize(result).decode('utf-8')
 
+def remove_values_from_list(lst, iterable):
+	return [item for item in lst if item.strip() not in iterable]
