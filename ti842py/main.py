@@ -149,6 +149,13 @@ def main():
 	)
 
 	parser.add_argument(
+		'--clear-persist-data',
+		action='store_true',
+		help='Clear ti842py persistant data (variables, graph settings, etc.)',
+		dest='clear_persist_data'
+	)
+
+	parser.add_argument(
 		'-r',
 		'--run',
 		action="store_true",
@@ -172,6 +179,10 @@ def main():
 
 	if infile is None:
 		raise argparse.ArgumentError(infile_argument, 'the infile argument is required')
+
+	if args.clear_persist_data:
+		if os.path.isfile(os.path.expanduser('~/.ti842py-persistant')):
+			os.remove(os.path.expanduser('~/.ti842py-persistant'))
 
 	transpile(infile, args.outfile, args.n, args.d, args.multiplication, args.floating_point, args.turbo_draw, args.run)
 
