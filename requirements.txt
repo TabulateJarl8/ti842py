@@ -1,0 +1,4 @@
+basically-ti-basic>=0.1.6
+pythondialog>=3.5.1
+graphics.py>=5.0.0
+pynput>=1.7.3
