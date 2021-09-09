@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.WARNING)
 
 
 class TIBasicParser:
-	def __init__(self, basic, multiplication, floating_point, turbo_draw):
+	def __init__(self, basic, multiplication, floating_point, turbo_draw, persist_data):
 		if isinstance(basic, list):
 			self.basic = basic
 		elif isinstance(basic, str):
@@ -24,6 +24,7 @@ class TIBasicParser:
 		self.multiplication = multiplication
 		self.floating_point = floating_point
 		self.turbo_draw = turbo_draw
+		self.persist_data = persist_data
 
 		# Utility Functions
 		self.UTILS = {"wait": {"code": [""], "imports": ["import time"], "enabled": False}, "menu": {"code": [""], "imports": ["import dialog"], "enabled": False}, "math": {"code": [""], "imports": ["import math"], "enabled": False}, 'random': {'code': [''], 'imports': ['import random'], 'enabled': False}, 'traceback': {'code': [''], 'imports': ['import traceback'], 'enabled': True}}
@@ -41,6 +42,9 @@ class TIBasicParser:
 
 		if self.turbo_draw:
 			self.UTILS['draw']['code'] = [line for line in self.UTILS['draw']['code'] if '@_slow' not in line]
+
+		if self.persist_data:
+			self.UTILS['persistant_data']['enabled'] = True
 
 		self.drawLock = False
 
@@ -431,10 +435,15 @@ class TIBasicParser:
 	def toPython(self):
 		self.pythonCode = []
 
-		self.pythonCode += ["def main():", "\tl1, l2, l3, l4, l5, l6 = ([None for _ in range(0, 999)] for _ in range(6)) # init lists"]
+		self.pythonCode += ["def main():"]
+		self.pythonCode += ["\tl1, l2, l3, l4, l5, l6 = ([None for _ in range(0, 999)] for _ in range(6)) # init lists"]
 		self.pythonCode += ["\tA = B = C = D = E = F = G = H = I = J = K = L = M = N = O = P = Q = R = S = T = U = V = W = X = Y = Z = θ = 0 # init variables"]
+		if self.UTILS['persistant_data']['enabled']:
+			self.pythonCode += ['\tlocals().update(load_persistant_data())']
 
-		self.indentLevel = 1
+		self.pythonCode += ['\ttry:']
+
+		self.indentLevel = 2
 		# indentIncrease increases the indent on the next line
 		self.indentIncrease = False
 		# indentDecrease decreases the indent on the current line
@@ -474,11 +483,12 @@ class TIBasicParser:
 		if self.UTILS['draw']['enabled']:
 			# hang on end if drawing
 			self.pythonCode += [
-				'\ttry:',
-				'\t\twhile True:',
-				'\t\t\tdraw.win.getMouse()',
-				'\texcept GraphicsError:',
-				'\t\tpass'
+				'		try:',
+				'			while True:',
+				'				draw.win.getMouse()',
+				'		except GraphicsError:',
+				'			pass',
+				''
 			]
 
 		# Remove get_key functions that surround inputs if getKey isn't used
@@ -491,6 +501,25 @@ class TIBasicParser:
 					'listener.start()'
 				)
 			)
+
+		self.pythonCode += [
+			'	except:',
+			'		traceback.print_exc()',
+			'		try:',
+			'			import sys, termios',
+			'			# clear stdin on unix-like systems',
+			'			termios.tcflush(sys.stdin, termios.TCIFLUSH)',
+			'		except ImportError:',
+			'			pass',
+			''
+		]
+
+		if self.UTILS['persistant_data']['enabled']:
+			self.pythonCode += [
+				'	finally:',
+				'		save_persistant_data(locals().copy())',
+				''
+			]
 
 		# Decorate main with with_goto if goto is used
 		if self.UTILS["goto"]["enabled"]:
@@ -521,16 +550,7 @@ class TIBasicParser:
 
 		self.pythonCode += [
 			'if __name__ == \'__main__\':',
-			'\ttry:',
-			'\t\tmain()',
-			'\texcept:',
-			'\t\ttraceback.print_exc()',
-			'\t\ttry:',
-			'\t\t\timport sys, termios',
-			'\t\t\t# clear stdin on unix-like systems',
-			'\t\t\ttermios.tcflush(sys.stdin, termios.TCIFLUSH)',
-			'\t\texcept ImportError:',
-			'\t\t\tpass'
+			'	main()'
 		]
 
 		return self.pythonCode
