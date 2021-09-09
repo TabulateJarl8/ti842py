@@ -29,7 +29,7 @@ def isUTF8(file):
 		return True
 
 
-def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, floating_point=True, persist_data=True, turbo_draw=False, run=False):
+def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False, multiplication=True, floating_point=True, turbo_draw=False, run=False):
 
 	# detect stdin
 	if hasattr(infile, 'name'):
@@ -49,7 +49,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with tempfile.NamedTemporaryFile() as f:
 			btb.decompile_file(infile, f.name)
 			with open(f.name, 'r') as fp:
-				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()], multiplication, floating_point, turbo_draw, persist_data).toPython()
+				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()], multiplication, floating_point, turbo_draw).toPython()
 
 	else:
 		# Dont decompile
@@ -58,7 +58,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with open(infile, 'r') as f:
 			file_lines = [line.strip() for line in f.readlines()]
 
-		pythonCode = TIBasicParser(file_lines, multiplication, floating_point, turbo_draw, persist_data).toPython()
+		pythonCode = TIBasicParser(file_lines, multiplication, floating_point, turbo_draw).toPython()
 
 	# Close temp_stdin if used
 	if 'temp_stdin' in vars() or 'temp_stdin' in globals():
@@ -149,20 +149,6 @@ def main():
 	)
 
 	parser.add_argument(
-		'--clear-persist-data',
-		action='store_true',
-		help='Clear ti842py persistant data (variables, graph settings, etc.)',
-		dest='clear_persist_data'
-	)
-
-	parser.add_argument(
-		'--no-persist-data',
-		action='store_false',
-		help='Generated program will not use persistant data',
-		dest='persist_data'
-	)
-
-	parser.add_argument(
 		'-r',
 		'--run',
 		action="store_true",
@@ -187,11 +173,7 @@ def main():
 	if infile is None:
 		raise argparse.ArgumentError(infile_argument, 'the infile argument is required')
 
-	if args.clear_persist_data:
-		if os.path.isfile(os.path.expanduser('~/.ti842py-persistant')):
-			os.remove(os.path.expanduser('~/.ti842py-persistant'))
-
-	transpile(infile, args.outfile, args.n, args.d, args.multiplication, args.floating_point, args.persist_data, args.turbo_draw, args.run)
+	transpile(infile, args.outfile, args.n, args.d, args.multiplication, args.floating_point, args.turbo_draw, args.run)
 
 
 if __name__ == "__main__":
