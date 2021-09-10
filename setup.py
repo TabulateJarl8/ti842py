@@ -1,13 +1,14 @@
 import setuptools
 import os
 
-with open("README.md", "r") as fh:
+here = os.path.abspath(os.path.dirname(__file__))
+
+with open(os.path.join(here, "README.md"), "r") as fh:
 	long_description = fh.read()
 
-with open('requirements.txt') as fh:
+with open(os.path.join(here, 'requirements.txt')) as fh:
 	install_requires = [line.rstrip() for line in fh.readlines()]
 
-here = os.path.abspath(os.path.dirname(__file__))
 about = {}
 with open(os.path.join(here, "ti842py", "__version__.py"), "r") as f:
 	exec(f.read(), about)
