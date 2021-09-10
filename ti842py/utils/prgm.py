@@ -13,11 +13,10 @@ def prgm(program_path):
 
 	if user_path:
 		# directly check if the file exists after expanding user
-		if os.path.isfile(program_path):
-			directory_listing = [program_path]
-			program_name_index = 0
-		else:
+		if not os.path.isfile(program_path):
 			raise FileNotFoundError(f'[Errno 2] No such file or directory: \'{program_path}\'')
+		directory_listing = [program_path]
+		program_name_index = 0
 	else:
 		# change case to lower in order to match extension
 		directory_listing = os.listdir()

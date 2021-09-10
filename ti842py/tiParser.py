@@ -60,11 +60,9 @@ class TIBasicParser:
 		elif line == "":
 			# Blank
 			statement = ""
-		# Disp
 		elif line.startswith("Disp "):
 			statement = re.search("Disp (.*[^)])", line).groups(1)[0]
 			statement = "print(" + parsing_utils.closeOpen(statement) + ", sep=\"\")"
-		# If
 		elif line.startswith("If "):
 			try:
 				if self.basic[index + 1] == "Then":
@@ -80,10 +78,7 @@ class TIBasicParser:
 					# If statement on 2 lines; no Then
 					statement = ["if " + parsing_utils.fixEquals(line.lstrip("If ")) + ":", '\t' + self.convertLine(index + 1, self.basic[index + 1])]
 
-					if self.basic[index + 2].startswith('End'):
-						self.skipLine = 2 # prioritize ending the if statement
-					else:
-						self.skipLine = 1 # skip next line since its incorporated into this line
+					self.skipLine = 2 if self.basic[index + 2].startswith('End') else 1
 			except IndexError:
 				# Last line in file, test for 1 line If statement
 				if re.search(r"If.*[^\"]:", line) is not None:
@@ -91,7 +86,6 @@ class TIBasicParser:
 		elif line == "Then":
 			return None
 
-		# Elif
 		elif line == "Else" and self.basic[index + 1].startswith("If"):
 			statement = "elif " + self.basic[index + 1].lstrip("If ")
 			statement = parsing_utils.fixEquals(statement)
@@ -99,7 +93,6 @@ class TIBasicParser:
 			self.indentDecrease = True
 			self.indentIncrease = True
 			self.skipLine = 1
-		# Else
 		elif line == "Else" and not (self.basic[index + 1].startswith("If")):
 			statement = "else:"
 			self.indentDecrease = True
@@ -109,7 +102,6 @@ class TIBasicParser:
 			statement = "clear()"
 		elif line == "End":
 			self.indentDecrease = True
-		# Input
 		elif line.startswith("Input"):
 			statement = line.split(",")
 			if len(statement) > 1:
@@ -131,7 +123,6 @@ class TIBasicParser:
 				statement = [statement]
 			statement.insert(0, 'listener.stop()')
 			statement.extend(['listener = pynput.keyboard.Listener(on_press=get_key.set_last_key)', 'listener.start()'])
-		# For loop
 		elif line.startswith("For"):
 			args = line[4:].strip("()").split(",")
 			statement = "for " + args[0] + " in range(" + args[1] + ", " + args[2] + ' + 1'
@@ -139,7 +130,6 @@ class TIBasicParser:
 				statement += ", " + args[3]
 			statement += "):"
 			self.indentIncrease = True
-		# While loop
 		elif line.startswith("While "):
 			if re.search(r"While.*[^\"]:", line) is None:
 				statement = "while " + parsing_utils.fixEquals(line[6:]) + ":"
@@ -148,12 +138,10 @@ class TIBasicParser:
 				# while statement on 1 line
 				statement = ["while " + parsing_utils.fixEquals(line.lstrip("While ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("While ").split(":", 1)[1])]
 
-		# Repeat loop (tests at bottom)
 		elif line.startswith("Repeat "):
 			statement = ["firstPass = True", "while firstPass is True or not (" + parsing_utils.fixEquals(line[7:]) + "):", "\tfirstPass = False"]
 			self.indentIncrease = True
 
-		# Variables
 		elif "->" in line or "→" in line:
 			statement = re.split("->|→", line)
 			statement.reverse()
@@ -165,7 +153,6 @@ class TIBasicParser:
 			else:
 				statement = " = ".join(statement)
 
-		# Pause
 		elif line.startswith("Pause"):
 			args = line[5:].strip().split(",")
 			if len(args) <= 1:
@@ -182,18 +169,13 @@ class TIBasicParser:
 			else:
 				statement = ["print(" + str(args[0]) + ")", "time.sleep(" + args[1] + ")"]
 				self.UTILS["wait"]["enabled"] = True
-		# Wait
 		elif line.startswith("Wait"):
 			statement = "time.sleep(" + line[5:] + ")"
 			self.UTILS["wait"]["enabled"] = True
-		# Stop
 		elif line == "Stop":
 			statement = "exit()"
-		# DelVar
 		elif line.startswith("DelVar"):
 			statement = "del " + line[7:]
-		# Prompt
-		# TODO: Fix prompt after Output going over output
 		elif line.startswith("Prompt"):
 			variable = line[7:]
 			if "," in variable:
@@ -208,30 +190,24 @@ class TIBasicParser:
 				statement = [statement]
 			statement.insert(0, 'listener.stop()')
 			statement.extend(['listener = pynput.keyboard.Listener(on_press=get_key.set_last_key)', 'listener.start()'])
-		# Goto (eww)
 		elif line.startswith("Goto "):
 			statement = "goto .lbl" + line[5:]
 			self.UTILS["goto"]["enabled"] = True
-		# Lbl
 		elif line.startswith("Lbl "):
 			statement = "label .lbl" + line[4:]
 			statement = statement.replace(':', '\n') # you can end lbl with :
 			self.UTILS["goto"]["enabled"] = True
-		# Output
 		elif line.startswith("Output("):
 			statement = parsing_utils.noStringReplace('Output', 'output', [parsing_utils.closeOpen(line)])
 			self.UTILS["output"]["enabled"] = True
-		# DS<(
 		elif line.startswith("DS<("):
 			variable, value = line[3:].strip("()").split(",")
 			statement = ["if " + variable + " - 1 >= " + value + ":", "\t" + self.convertLine(index + 1, self.basic[index + 1])]
 			self.skipLine = 1
-		# IS>(
 		elif line.startswith("IS>("):
 			variable, value = line[3:].strip("()").split(",")
 			statement = ["if " + variable + " + 1 <= " + value + ":", "\t" + self.convertLine(index + 1, self.basic[index + 1])]
 			self.skipLine = 1
-		# Menu
 		elif line.startswith("Menu"):
 			if shutil.which("dialog") is None:
 				logger.warning("dialog executable not found. Please install dialog to use menus")
@@ -243,68 +219,55 @@ class TIBasicParser:
 			statement = parsing_utils.menu(title, options)
 			self.UTILS["menu"]["enabled"] = True
 			self.UTILS['clear']['enabled'] = True
-		# Line(
 		elif line.startswith('Line('):
 			statement = parsing_utils.closeOpen(line.replace('Line(', 'draw.line('))
 			self.UTILS['draw']['enabled'] = True
 
-		# BackgroundOff
 		elif line == 'BackgroundOff':
 			statement = 'draw.backgroundOff()'
 			self.UTILS['draw']['enabled'] = True
 
-		# Background On
 		elif line.startswith('BackgroundOn '):
 			statement = line.replace('BackgroundOn ', 'draw.backgroundOn(')
 			statement = statement.split('(')[0] + '(' + statement.split('(')[1] + ')'
 			self.UTILS['draw']['enabled'] = True
 
-		# ClrDraw
 		elif line == 'ClrDraw':
 			statement = 'draw.clrDraw()'
 			self.UTILS['draw']['enabled'] = True
 
-		# Circle
 		elif line.startswith('Circle('):
 			statement = parsing_utils.closeOpen(line.replace('Circle(', 'draw.circle('))
 			self.UTILS['draw']['enabled'] = True
 
-		# Text
 		elif line.startswith('Text('):
 			statement = parsing_utils.closeOpen(line.replace('Text(', 'draw.text('))
 			self.UTILS['draw']['enabled'] = True
 
-		# Pxl-On
 		elif line.startswith('Pxl-On('):
 			statement = parsing_utils.closeOpen(line.replace('Pxl-On(', 'draw.pxlOn('))
 			self.UTILS['draw']['enabled'] = True
 
-		# Pxl-Off
 		elif line.startswith('Pxl-Off('):
 			statement = parsing_utils.closeOpen(line.replace('Pxl-Off(', 'draw.pxlOff('))
 			self.UTILS['draw']['enabled'] = True
 
-		# pxl-Test
 		elif line.startswith('pxl-Test('):
 			statement = parsing_utils.closeOpen(line.replace('pxl-Test(', 'draw.pxlTest('))
 			self.UTILS['draw']['enabled'] = True
 
-		# Pt-On
 		elif line.startswith('Pt-On('):
 			statement = parsing_utils.closeOpen(line.replace('Pt-On(', 'draw.ptOn('))
 			self.UTILS['draw']['enabled'] = True
 
-		# Pt-Off
 		elif line.startswith('Pt-Off('):
 			statement = parsing_utils.closeOpen(line.replace('Pt-Off(', 'draw.ptOff('))
 			self.UTILS['draw']['enabled'] = True
 
-		# TextColor
 		elif line.startswith('TextColor('):
 			statement = parsing_utils.closeOpen(line.replace('TextColor(', 'draw.textColor('))
 			self.UTILS['draw']['enabled'] = True
 
-		# DispGraph
 		elif line == 'DispGraph':
 			statement = 'draw.openWindow()'
 			self.UTILS['draw']['enabled'] = True
@@ -316,7 +279,6 @@ class TIBasicParser:
 			statement = 'prgm("' + line[4:] + '")'
 			self.UTILS['prgm']['enabled'] = True
 
-		# Clr single list
 		elif line.startswith('ClrList '):
 			statement = line[8:] + ' = [None for _ in range(0, 999)]'
 
