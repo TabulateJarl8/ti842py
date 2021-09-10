@@ -28,6 +28,7 @@ jobs:
       - name: Run a multi-line script
         run: |
           pip3 install setuptools wheel
+          ls
           python setup.py sdist
           pip3 install dist/*
           python3 tests/test.py
