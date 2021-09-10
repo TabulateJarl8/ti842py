@@ -1,15 +1,11 @@
 import setuptools
 import os
 
-install_requires = [
-	"basically-ti-basic>=0.1.6",
-	"pythondialog>=3.5.1",
-	"graphics.py>=5.0.0",
-	"pynput>=1.7.3"
-]
-
 with open("README.md", "r") as fh:
 	long_description = fh.read()
+
+with open('requirements.txt') as fh:
+	install_requires = [line.rstrip() for line in fh.readlines()]
 
 here = os.path.abspath(os.path.dirname(__file__))
 about = {}

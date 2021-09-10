@@ -312,6 +312,10 @@ class TIBasicParser:
 		elif line == 'ClrAllLists':
 			statement = 'l1, l2, l3, l4, l5, l6 = ([None for _ in range(0, 999)] for _ in range(6))'
 
+		elif line.startswith('prgm'):
+			statement = 'prgm("' + line[4:] + '")'
+			self.UTILS['prgm']['enabled'] = True
+
 		# Clr single list
 		elif line.startswith('ClrList '):
 			statement = line[8:] + ' = [None for _ in range(0, 999)]'
