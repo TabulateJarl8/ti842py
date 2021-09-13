@@ -295,7 +295,7 @@ class Matrix:
 	def __ne__(self, other):
 		return not self.__eq__(other)
 
-	def __repr__(self):
+	def __str__(self):
 		return '\n'.join(['[' + ' '.join([str(num) for num in sublist]) + ']' for sublist in self.matrix])
 
 	def __getitem__(self, index):

@@ -2,6 +2,8 @@ import pickle
 import re
 import os
 
+import matrix
+
 class DataLoader:
 	def __init__(self):
 		self.storage_location = os.path.expanduser('~/.ti842py-persistant')
@@ -47,14 +49,17 @@ class DataLoader:
 			for key, value in self.all_objects[item].items():
 				locals_object[key] = value
 
-	def __repr__(self):
-		return str(self.all_objects)
+	def __str__(self):
+		return repr(self.all_objects)
 
-# A = 'no'
-# thing = DataLoader().load_locals(locals().copy())
-# print(thing)
+matrix_A = matrix.Matrix()
+matrix_A.reshape(6, 7)
+A = 'no'
+thing = DataLoader().load_locals(locals().copy())
+print(thing)
 # thing.write_data()
-thing = DataLoader().load_data()
-thing.update_locals(locals())
-print(locals())
-print(A)
+
+# thing = DataLoader().load_data()
+# thing.update_locals(locals())
+# print(locals())
+# print(A)
