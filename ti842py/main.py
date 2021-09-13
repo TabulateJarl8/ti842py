@@ -171,7 +171,8 @@ def main():
 		infile = args.infile
 
 	if infile is None:
-		raise argparse.ArgumentError(infile_argument, 'the infile argument is required')
+		parser.print_help()
+		sys.exit(1)
 
 	transpile(infile, args.outfile, args.n, args.d, args.multiplication, args.floating_point, args.turbo_draw, args.run)
 
