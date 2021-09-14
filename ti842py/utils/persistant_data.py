@@ -1,8 +1,8 @@
 import pickle
 import re
 import os
-
-import matrix
+import traceback
+import sys
 
 class DataLoader:
 	def __init__(self):
@@ -11,6 +11,13 @@ class DataLoader:
 		self.load_data()
 
 	def _load_from_all_objects(self):
+		if 'variables' not in self.all_objects:
+			self.all_objects['variables'] = {}
+		if 'matrices' not in self.all_objects:
+			self.all_objects['matrices'] = {}
+		if 'lists' not in self.all_objects:
+			self.all_objects['lists'] = {}
+
 		self.variables = self.all_objects['variables']
 		self.matrices = self.all_objects['matrices']
 		self.lists = self.all_objects['lists']
@@ -49,14 +56,23 @@ class DataLoader:
 			for key, value in self.all_objects[item].items():
 				locals_object[key] = value
 
+	def exception_hook(self, exc_type, value, tb):
+		traceback.print_exception(exc_type, value, tb)
+
+		# iterate to last frame in traceback
+		while tb.tb_next:
+			tb = tb.tb_next
+
+		self.load_locals(tb.tb_frame.f_locals)
+		self.write_data()
+
 	def __str__(self):
 		return repr(self.all_objects)
 
-matrix_A = matrix.Matrix()
-matrix_A.reshape(6, 7)
-A = 'no'
-thing = DataLoader().load_locals(locals().copy())
-print(thing)
+persistant_data_loader = DataLoader()
+sys.excepthook = persistant_data_loader.exception_hook
+# thing = DataLoader().load_locals(locals().copy())
+# print(thing)
 # thing.write_data()
 
 # thing = DataLoader().load_data()
