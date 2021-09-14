@@ -42,6 +42,8 @@ class TIBasicParser:
 		if self.turbo_draw:
 			self.UTILS['draw']['code'] = [line for line in self.UTILS['draw']['code'] if '@_slow' not in line]
 
+		self.UTILS['persistant_data']['enabled'] = True
+
 		self.drawLock = False
 
 	def convertLine(self, index, line):
