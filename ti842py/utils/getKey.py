@@ -23,7 +23,7 @@ class GetKey:
 			"b": 42,
 			"c": 43,
 			pynput.keyboard.Key.f8: 44,
-			pynput.keyboard.Key.f9: 45,
+			pynput.keyboard.Key.backspace: 45,
 			"d": 51,
 			"e": 52,
 			"f": 53,
