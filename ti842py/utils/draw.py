@@ -21,8 +21,10 @@ MEDGRAY = 22
 GRAY = 23
 DARKGRAY = 24
 
+
 class InvalidColorError(Exception):
 	pass
+
 
 class Draw:
 	def __init__(self):

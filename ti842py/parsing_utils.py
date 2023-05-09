@@ -70,7 +70,7 @@ def parenthesis_split(sentence, separator=" ", lparen="(", rparen=")"):
 	if nb_brackets > 0:
 		raise Exception("Syntax error")
 
-	return([sentence[i:j].strip(separator) for i, j in zip(l, l[1:])])
+	return [sentence[i:j].strip(separator) for i, j in zip(l, l[1:])]
 
 
 def last_line_without_variable_assignment_ans(full_code):
@@ -82,9 +82,9 @@ def last_line_without_variable_assignment_ans(full_code):
 
 	for i in range(len(full_code)):
 		if (not full_code[i].strip().endswith(':')) and \
-		(noStringReplace(r'(?<!Ans )=', '', [full_code[i]]) == [full_code[i]]) and \
-		not full_code[i].strip().startswith('#') and \
-		'.lbl' not in full_code[i]:
+			(noStringReplace(r'(?<!Ans )=', '', [full_code[i]]) == [full_code[i]]) and \
+			not full_code[i].strip().startswith('#') and \
+			'.lbl' not in full_code[i]:
 			# no loops etc that end with : and nothing with item assignments or comparisons
 			# no comments
 			# if we come across an Ans before finding a statmenet that can use Ans, just use the last Ans statement
@@ -94,9 +94,7 @@ def last_line_without_variable_assignment_ans(full_code):
 
 			break
 
-
 	return full_code[::-1]
-
 
 
 def menu(title, args):
@@ -206,6 +204,7 @@ def decistmt(s):
 
 	# Convert token list back into source code
 	return tokenize.untokenize(result).decode('utf-8')
+
 
 def remove_values_from_list(lst, iterable):
 	return [item for item in lst if item.strip() not in iterable]

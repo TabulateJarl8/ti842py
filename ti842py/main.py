@@ -8,10 +8,10 @@ import io
 import pty
 
 try:
-	from .tiParser import TIBasicParser
+	from .ti_parser import TIBasicParser
 	from .__version__ import __version__
 except ImportError:
-	from tiParser import TIBasicParser
+	from ti842py.ti_parser import TIBasicParser
 	from __version__ import __version__
 
 
@@ -49,7 +49,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with tempfile.NamedTemporaryFile() as f:
 			btb.decompile_file(infile, f.name)
 			with open(f.name, 'r') as fp:
-				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()], multiplication, floating_point, turbo_draw).toPython()
+				pythonCode = TIBasicParser([line.strip() for line in fp.readlines()], multiplication, floating_point, turbo_draw).to_python()
 
 	else:
 		# Dont decompile
@@ -58,7 +58,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 		with open(infile, 'r') as f:
 			file_lines = [line.strip() for line in f.readlines()]
 
-		pythonCode = TIBasicParser(file_lines, multiplication, floating_point, turbo_draw).toPython()
+		pythonCode = TIBasicParser(file_lines, multiplication, floating_point, turbo_draw).to_python()
 
 	# Close temp_stdin if used
 	if 'temp_stdin' in vars() or 'temp_stdin' in globals():

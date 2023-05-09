@@ -1,5 +1,6 @@
 import pynput
 
+
 class GetKey:
 	def __init__(self):
 		self.last_key = 0

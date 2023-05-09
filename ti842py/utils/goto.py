@@ -161,7 +161,7 @@ def _write_instructions(buf, pos, ops):
 
 def _warn_bug(msg):
 	warnings.warn("Internal error detected" +
-				  " - result of with_goto may be incorrect. (%s)" % msg)
+				" - result of with_goto may be incorrect. (%s)" % msg)
 
 
 class _BlockStack(object):

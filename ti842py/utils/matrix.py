@@ -3,14 +3,18 @@ import copy
 import operator
 import math
 
+
 class DimensionMismatchError(Exception):
 	pass
+
 
 class InvalidDimensionError(Exception):
 	pass
 
+
 class SingularMatrixError(Exception):
 	pass
+
 
 class Matrix:
 	'''
@@ -99,7 +103,6 @@ class Matrix:
 				if isinstance(item_b, float):
 					item_b = decimal.Decimal(str(item_b))
 
-
 				item_computation = operation(item_a, item_b)
 				if isinstance(item_computation, decimal.Decimal):
 					if str(item_computation).isdigit():
@@ -133,7 +136,7 @@ class Matrix:
 			return [row[:j] + row[j + 1:] for row in (m[:i] + m[i + 1:])]
 
 		def getMatrixDeternminant(m):
-			#base case for 2x2 matrix
+			# base case for 2x2 matrix
 			if len(m) == 2:
 				return m[0][0] * m[1][1] - m[0][1] * m[1][0]
 
@@ -144,12 +147,14 @@ class Matrix:
 
 		def getMatrixInverse(m):
 			determinant = getMatrixDeternminant(m)
-			#special case for 2x2 matrix:
+			# special case for 2x2 matrix:
 			if len(m) == 2:
-				return [[m[1][1] / determinant, -1 * m[0][1] / determinant],
-						[-1 * m[1][0] / determinant, m[0][0] / determinant]]
+				return [
+					[m[1][1] / determinant, -1 * m[0][1] / determinant],
+					[-1 * m[1][0] / determinant, m[0][0] / determinant]
+				]
 
-			#find matrix of cofactors
+			# find matrix of cofactors
 			cofactors = []
 			for r in range(len(m)):
 				cofactorRow = []
@@ -169,7 +174,6 @@ class Matrix:
 			raise SingularMatrixError('No inverse matrix exists.') from exc
 
 		return Matrix(new_matrix)
-
 
 	def __len__(self):
 		# Return rows, cols

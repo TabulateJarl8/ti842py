@@ -317,7 +317,7 @@ def find_substring_index(main, substring):
 	for index, token in enumerate(main_tokens):
 		if (
 			token == sub_tokens[0]
-			and main_tokens[index : index + len(sub_tokens)] == sub_tokens
+			and main_tokens[index:index + len(sub_tokens)] == sub_tokens
 		):
 			return index
 	return -1
@@ -447,13 +447,13 @@ def untokenize(tokens):
 			and token.start_row > last_row
 		):
 			if previous_line.endswith(("\\\n", "\\\r\n", "\\\r")):
-				words.append(previous_line[len(previous_line.rstrip(" \t\n\r\\")) :])
+				words.append(previous_line[len(previous_line.rstrip(" \t\n\r\\")):])
 
 		# Preserve spacing.
 		if token.start_row > last_row:
 			last_column = 0
 		if token.start_col > last_column:
-			words.append(token.line[last_column : token.start_col])
+			words.append(token.line[last_column:token.start_col])
 
 		words.append(token.string)
 

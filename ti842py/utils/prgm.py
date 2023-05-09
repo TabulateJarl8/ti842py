@@ -1,5 +1,6 @@
 import os
 
+
 def prgm(program_path):
 	if '.' not in program_path and '~' not in program_path and program_path.isupper():
 		# most likely code from a TI-BASIC program, since these are constraints for program names

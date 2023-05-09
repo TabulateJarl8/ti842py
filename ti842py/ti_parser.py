@@ -44,7 +44,7 @@ class TIBasicParser:
 
 		self.drawLock = False
 
-	def convertLine(self, index, line):
+	def convert_line(self, index, line):
 		# TODO: possible curses interface instead of just printing and outputting
 
 		statement = ""
@@ -75,10 +75,10 @@ class TIBasicParser:
 					self.indentIncrease = True
 				elif re.search(r"If.*[^\"]:", line) is not None:
 					# If statement on 1 line
-					statement = ["if " + parsing_utils.fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
+					statement = ["if " + parsing_utils.fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convert_line(index + 1, line.lstrip("If ").split(":", 1)[1])]
 				else:
 					# If statement on 2 lines; no Then
-					statement = ["if " + parsing_utils.fixEquals(line.lstrip("If ")) + ":", '\t' + self.convertLine(index + 1, self.basic[index + 1])]
+					statement = ["if " + parsing_utils.fixEquals(line.lstrip("If ")) + ":", '\t' + self.convert_line(index + 1, self.basic[index + 1])]
 
 					if self.basic[index + 2].startswith('End'):
 						self.skipLine = 2 # prioritize ending the if statement
@@ -87,7 +87,7 @@ class TIBasicParser:
 			except IndexError:
 				# Last line in file, test for 1 line If statement
 				if re.search(r"If.*[^\"]:", line) is not None:
-					statement = ["if " + parsing_utils.fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("If ").split(":", 1)[1])]
+					statement = ["if " + parsing_utils.fixEquals(line.lstrip("If ").split(":", 1)[0]) + ":", "\t" + self.convert_line(index + 1, line.lstrip("If ").split(":", 1)[1])]
 		elif line == "Then":
 			return None
 
@@ -114,19 +114,19 @@ class TIBasicParser:
 			statement = line.split(",")
 			if len(statement) > 1:
 				if "," in statement[1]:
-					statement = statement[1] + " = [toNumber(number) for number in input(" + parsing_utils.closeOpen(statement[0][6:]) + ")]"
+					statement = statement[1] + " = [to_number(number) for number in input(" + parsing_utils.closeOpen(statement[0][6:]) + ")]"
 				else:
-					statement = statement[1] + " = toNumber(input(" + parsing_utils.closeOpen(statement[0][6:]) + "))"
+					statement = statement[1] + " = to_number(input(" + parsing_utils.closeOpen(statement[0][6:]) + "))"
 			else:
 				if statement[0].strip() != "Input":
 					# No input text
-					statement = statement[0][6:] + " = toNumber(input(\"?\"))"
+					statement = statement[0][6:] + " = to_number(input(\"?\"))"
 				else:
 					statement = "input()"
-			self.UTILS["toNumber"]["enabled"] = True
+			self.UTILS["to_number"]["enabled"] = True
 
 			# stop listening for keyboard input on input
-			# these statements will be removed in post-processing if getKey isn't used
+			# these statements will be removed in post-processing if getkey isn't used
 			if not isinstance(statement, list):
 				statement = [statement]
 			statement.insert(0, 'listener.stop()')
@@ -146,7 +146,7 @@ class TIBasicParser:
 				self.indentIncrease = True
 			else:
 				# while statement on 1 line
-				statement = ["while " + parsing_utils.fixEquals(line.lstrip("While ").split(":", 1)[0]) + ":", "\t" + self.convertLine(index + 1, line.lstrip("While ").split(":", 1)[1])]
+				statement = ["while " + parsing_utils.fixEquals(line.lstrip("While ").split(":", 1)[0]) + ":", "\t" + self.convert_line(index + 1, line.lstrip("While ").split(":", 1)[1])]
 
 		# Repeat loop (tests at bottom)
 		elif line.startswith("Repeat "):
@@ -174,7 +174,7 @@ class TIBasicParser:
 					statement += str(args[0]) + ")"
 
 				# stop listening for keyboard input on input
-				# these statements will be removed in post-processing if getKey isn't used
+				# these statements will be removed in post-processing if getkey isn't used
 				if not isinstance(statement, list):
 					statement = [statement]
 				statement.insert(0, 'listener.stop()')
@@ -197,13 +197,13 @@ class TIBasicParser:
 		elif line.startswith("Prompt"):
 			variable = line[7:]
 			if "," in variable:
-				statement = variable + " = [toNumber(number) for number in input(\"" + variable + "=?\").split(\",\")]"
+				statement = variable + " = [to_number(number) for number in input(\"" + variable + "=?\").split(\",\")]"
 			else:
-				statement = variable + " = toNumber(input(\"" + variable + "=?\"))"
-			self.UTILS["toNumber"]["enabled"] = True
+				statement = variable + " = to_number(input(\"" + variable + "=?\"))"
+			self.UTILS["to_number"]["enabled"] = True
 
 			# stop listening for keyboard input on input
-			# these statements will be removed in post-processing if getKey isn't used
+			# these statements will be removed in post-processing if getkey isn't used
 			if not isinstance(statement, list):
 				statement = [statement]
 			statement.insert(0, 'listener.stop()')
@@ -224,12 +224,12 @@ class TIBasicParser:
 		# DS<(
 		elif line.startswith("DS<("):
 			variable, value = line[3:].strip("()").split(",")
-			statement = ["if " + variable + " - 1 >= " + value + ":", "\t" + self.convertLine(index + 1, self.basic[index + 1])]
+			statement = ["if " + variable + " - 1 >= " + value + ":", "\t" + self.convert_line(index + 1, self.basic[index + 1])]
 			self.skipLine = 1
 		# IS>(
 		elif line.startswith("IS>("):
 			variable, value = line[3:].strip("()").split(",")
-			statement = ["if " + variable + " + 1 <= " + value + ":", "\t" + self.convertLine(index + 1, self.basic[index + 1])]
+			statement = ["if " + variable + " + 1 <= " + value + ":", "\t" + self.convert_line(index + 1, self.basic[index + 1])]
 			self.skipLine = 1
 		# Menu
 		elif line.startswith("Menu"):
@@ -346,7 +346,7 @@ class TIBasicParser:
 		if "getKey" in ' '.join(statement):
 			# Replace getKey with get_key.get_last_key() if getKey is not inside of quotes
 			statement = parsing_utils.noStringReplace(r'getKey(?!\()+', "get_key.get_last_key()", statement)
-			self.UTILS["getKey"]["enabled"] = True
+			self.UTILS["getkey"]["enabled"] = True
 		if "[theta]" in ' '.join(statement):
 			# Replace [theta] with theta if [theta] is not inside of quotes
 			statement = [item.replace('[theta]', "θ") for item in statement]
@@ -359,11 +359,11 @@ class TIBasicParser:
 		if "getTime" in ' '.join(statement):
 			# Replace getTime with getTime() if getTime is not inside of quotes
 			statement = parsing_utils.noStringReplace(r'getTime(?!\()+', 'getTime()', statement)
-			self.UTILS["getDateTime"]["enabled"] = True
+			self.UTILS["get_datetime"]["enabled"] = True
 		if "getDate" in ' '.join(statement):
 			# Replace getDate with getDate() if getDate is not inside of quotes
 			statement = parsing_utils.noStringReplace(r'getDate(?!\()+', 'getDate()', statement)
-			self.UTILS["getDateTime"]["enabled"] = True
+			self.UTILS["get_datetime"]["enabled"] = True
 		if "sqrt(" in ' '.join(statement):
 			# Replace sqrt with math.sqrt if sqrt is not inside of quotes
 			statement = parsing_utils.noStringReplace('sqrt', 'math.sqrt', statement)
@@ -377,7 +377,7 @@ class TIBasicParser:
 			statement = parsing_utils.noStringReplace(r'rand\(([0-9])\)', r'[random.random() for _ in range(\1)]', statement)
 			self.UTILS['random']['enabled'] = True
 		if 'dayOfWk(' in ' '.join(statement):
-			self.UTILS['getDateTime']['enabled'] = True
+			self.UTILS['get_datetime']['enabled'] = True
 		if 'remainder(' in ' '.join(statement):
 			statement = parsing_utils.noStringReplace(r'remainder\(([^\)]+)\)', lambda m: m.group(1).replace(' ', '').split(',')[0] + ' % ' + m.group(1).replace(' ', '').split(',')[1], statement)
 
@@ -432,7 +432,7 @@ class TIBasicParser:
 
 		return statement
 
-	def toPython(self):
+	def to_python(self):
 		self.pythonCode = []
 
 		self.pythonCode += ["def main():", "\tl1, l2, l3, l4, l5, l6 = ([None for _ in range(0, 999)] for _ in range(6)) # init lists"]
@@ -447,7 +447,7 @@ class TIBasicParser:
 
 		# Iterate over TI-BASIC code and convert each line
 		for index, line in enumerate(self.basic):
-			statement = self.convertLine(index, line)
+			statement = self.convert_line(index, line)
 
 			if self.UTILS['draw']['enabled'] and not self.drawLock:
 				self.drawLock = True
@@ -485,8 +485,8 @@ class TIBasicParser:
 				'\t\tpass'
 			]
 
-		# Remove get_key functions that surround inputs if getKey isn't used
-		if not self.UTILS['getKey']['enabled']:
+		# Remove get_key functions that surround inputs if getkey isn't used
+		if not self.UTILS['getkey']['enabled']:
 			self.pythonCode = parsing_utils.remove_values_from_list(
 				self.pythonCode,
 				(
@@ -504,8 +504,8 @@ class TIBasicParser:
 		if self.UTILS['matrix']['enabled']:
 			one_line_after_main_definition = self.pythonCode.index('def main():') + 1
 			self.pythonCode.insert(one_line_after_main_definition, '\tmatrix_A, matrix_B, matrix_C, matrix_D, matrix_E, matrix_F, matrix_G, matrix_H, matrix_I, matrix_J = (Matrix() for _ in range(10)) # init matrices')
-		if self.UTILS['getKey']['enabled']:
-			# initialize getKey
+		if self.UTILS['getkey']['enabled']:
+			# initialize getkey
 			one_line_after_main_definition = self.pythonCode.index('def main():') + 1
 			self.pythonCode.insert(one_line_after_main_definition, '\tget_key = GetKey()')
 			self.pythonCode.insert(one_line_after_main_definition + 1, '\tlistener = pynput.keyboard.Listener(on_press=get_key.set_last_key)')
