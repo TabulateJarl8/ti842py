@@ -10,6 +10,8 @@
 <a href="https://GitHub.com/TabulateJarl8/ti842py/issues/"><img alt="GitHub Issues" src="https://img.shields.io/github/issues/TabulateJarl8/ti842py.svg" /></a>
 <a href="https://github.com/TabulateJarl8"><img alt="GitHub followers" src="https://img.shields.io/github/followers/TabulateJarl8?style=social" /></a>
 <a href="https://github.com/TabulateJarl8/ti842py"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/TabulateJarl8/ti842py?style=social" /></a>
+<br>
+<a href="https://ko-fi.com/L4L3L7IO2"><img alt="Kofi Badge" src="https://ko-fi.com/img/githubbutton_sm.svg" /></a>
 </p>
 
 ----
