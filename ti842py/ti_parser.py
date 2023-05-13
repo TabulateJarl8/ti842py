@@ -193,7 +193,6 @@ class TIBasicParser:
 		elif line.startswith("DelVar"):
 			statement = "del " + line[7:]
 		# Prompt
-		# TODO: Fix prompt after Output going over output
 		elif line.startswith("Prompt"):
 			variable = line[7:]
 			if "," in variable:
@@ -328,11 +327,12 @@ class TIBasicParser:
 				line.startswith("toString(") or \
 				line.startswith('randInt(') or \
 				line.startswith('rand') or \
+				line.startswith('round(') or \
 				re.search(r'^\[[A-J]\]', line):
 				statement = line
 			else:
-				statement = "# UNKNOWN INDENTIFIER: {}".format(line)
-				logger.warning("Unknown indentifier on line %s", index + 1)
+				statement = f"# UNKNOWN INDENTIFIER: {line}"
+				logger.warning(f"Unknown indentifier on line {index + 1}")
 
 		if isinstance(statement, str):
 			statement = [statement]
@@ -383,6 +383,10 @@ class TIBasicParser:
 
 		if 'dim(' in ' '.join(statement):
 			statement = parsing_utils.noStringReplace(r'dim\(', 'len(', statement)
+
+		if 'round(' in ' '.join(statement):
+			statement = parsing_utils.noStringReplace(r'round\(', 'ti_round(', statement)
+			self.UTILS['round']['enabled'] = True
 
 		if re.search(r'l[1-6]\([0-9A-Za-z]+\)', ' '.join(statement)):
 			# List subscription

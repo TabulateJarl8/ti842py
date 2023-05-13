@@ -4,7 +4,6 @@ import os
 import tempfile
 import sys
 import subprocess
-import io
 import pty
 
 try:
@@ -97,7 +96,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 
 def main():
 	parser = argparse.ArgumentParser(description='TI-BASIC to Python 3 Transpiler')
-	infile_argument = parser.add_argument(
+	parser.add_argument(
 		'infile',
 		metavar='infile',
 		nargs='?',
@@ -149,6 +148,13 @@ def main():
 	)
 
 	parser.add_argument(
+		'--reset-persistant-data',
+		action='store_true',
+		help='Reset the ti842py persistant data (variables, matrices, etc)',
+		dest='reset_data'
+	)
+
+	parser.add_argument(
 		'-r',
 		'--run',
 		action="store_true",
@@ -160,10 +166,20 @@ def main():
 		'-V',
 		'--version',
 		action='version',
-		version='ti842py {version}'.format(version=__version__)
+		version=f'ti842py {__version__}'
 	)
 
 	args = parser.parse_args()
+
+	if args.reset_data:
+		user_confirm = ''
+		while user_confirm not in {'y', 'n'}:
+			user_confirm = input('Are you sure you would like to remove the persistant data? [y/n] ').lower()
+		if user_confirm == 'y':
+			os.remove(os.path.expanduser('~/.ti842py-persistant'))
+			print('Removed persistant data')
+		else:
+			print('Cancelled removal of persistant data')
 
 	if hasattr(args.infile, '__getitem__'):
 		infile = args.infile[0]
@@ -171,7 +187,8 @@ def main():
 		infile = args.infile
 
 	if infile is None:
-		raise argparse.ArgumentError(infile_argument, 'the infile argument is required')
+		parser.print_help()
+		sys.exit(1)
 
 	transpile(infile, args.outfile, args.n, args.d, args.multiplication, args.floating_point, args.turbo_draw, args.run)
 
