@@ -1,4 +1,4 @@
-def toNumber(string):
+def to_number(string):
 	try:
 		return int(string)
 	except ValueError:

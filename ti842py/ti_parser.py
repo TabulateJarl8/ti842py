@@ -42,8 +42,6 @@ class TIBasicParser:
 		if self.turbo_draw:
 			self.UTILS['draw']['code'] = [line for line in self.UTILS['draw']['code'] if '@_slow' not in line]
 
-		self.UTILS['persistant_data']['enabled'] = True
-
 		self.drawLock = False
 
 	def convert_line(self, index, line):
@@ -195,7 +193,6 @@ class TIBasicParser:
 		elif line.startswith("DelVar"):
 			statement = "del " + line[7:]
 		# Prompt
-		# TODO: Fix prompt after Output going over output
 		elif line.startswith("Prompt"):
 			variable = line[7:]
 			if "," in variable:

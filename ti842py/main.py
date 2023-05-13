@@ -4,7 +4,6 @@ import os
 import tempfile
 import sys
 import subprocess
-import io
 import pty
 
 try:
@@ -97,7 +96,7 @@ def transpile(infile, outfile="stdout", decompileFile=True, forceDecompile=False
 
 def main():
 	parser = argparse.ArgumentParser(description='TI-BASIC to Python 3 Transpiler')
-	infile_argument = parser.add_argument(
+	parser.add_argument(
 		'infile',
 		metavar='infile',
 		nargs='?',
