@@ -34,8 +34,8 @@ class Draw:
 		self.points = {}
 		self.texts = {}
 		self.colors = {'10': 'blue', '11': 'red', '12': 'black', '13': 'magenta', '14': 'green', '15': 'orange', '16': 'brown', '17': 'navy', '18': 'light sky blue', '19': 'yellow', '20': 'white', '0': 'white', '21': 'light gray', '22': 'dark gray', '23': 'gray', '24': 'dark slate gray'}
-		for _ in range(1, 10):
-			self.colors[str(_)] = 'blue'
+		for i in range(1, 10):
+			self.colors[str(i)] = 'blue'
 		self.currentTextColor = 'blue'
 
 	def _slow(function):
